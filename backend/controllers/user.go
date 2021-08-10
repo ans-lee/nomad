@@ -21,7 +21,7 @@ func SignUp(c *gin.Context) {
         return
     }
 
-    if findUser(newUser.Email) {
+    if userExists(newUser.Email) {
         c.JSON(http.StatusConflict, gin.H{
             "error": "A user with this email already exists.",
         })
@@ -41,7 +41,30 @@ func SignUp(c *gin.Context) {
     })
 }
 
-func findUser(email string) bool {
+func LogIn(c *gin.Context) {
+    var data UserModel.LogIn
+    if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
+        c.JSON(http.StatusBadRequest, gin.H{
+            "error": "Fields are not in the correct format.",
+        })
+        return
+    }
+
+    var user UserModel.User
+    filter := bson.D{{Key: "email", Value: data.Email}, {Key: "password", Value: data.Password}}
+    if err := db.GetCollection(UserModel.COLLECTION_NAME).FindOne(context.Background(), filter).Decode(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{
+            "error": "Either password or email is incorrect.",
+        })
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": fmt.Sprintf("Successfully logged in!"),
+    })
+}
+
+func userExists(email string) bool {
     var user UserModel.User
     filter := bson.D{{Key: "email", Value: email}}
     return db.GetCollection(UserModel.COLLECTION_NAME).FindOne(context.Background(), filter).Decode(&user) == nil
