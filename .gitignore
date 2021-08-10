@@ -1,3 +1,6 @@
 # vim
 *.swp
 tags
+
+# Air (hot reload)
+tmp
