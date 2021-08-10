@@ -37,4 +37,5 @@ func main() {
 
 func setupRoutes(router *gin.RouterGroup) {
     routers.SetPongRoutes(router)
+    routers.SetAuthRoutes(router)
 }

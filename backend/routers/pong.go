@@ -6,5 +6,8 @@ import (
 )
 
 func SetPongRoutes(router *gin.RouterGroup) {
-    router.GET("/pong", controllers.Pong)
+    pongGroup := router.Group("/pong")
+    {
+        pongGroup.GET("/", controllers.Pong)
+    }
 }

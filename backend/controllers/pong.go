@@ -10,7 +10,13 @@ import (
 )
 
 func Pong(c *gin.Context) {
-    newUser := user.User{Name: "Anson", Age: 21, City: "Home"}
+    newUser := user.User{
+        Username: "alee",
+        Password: "password123",
+        Email: "alee@gmail.com",
+        FirstName: "Anson",
+        LastName: "Lee",
+    }
     db.GetCollection(user.COLLECTION_NAME).InsertOne(context.Background(), newUser)
     c.JSON(http.StatusOK, gin.H{
         "message": "pong!",
