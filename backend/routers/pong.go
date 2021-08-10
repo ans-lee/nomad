@@ -1,13 +1,11 @@
 package routers
 
 import (
-    "github.com/anslee/nomad/controllers"
-    "github.com/gin-gonic/gin"
+	"github.com/anslee/nomad/controllers"
+	"github.com/gin-gonic/gin"
 )
 
 func SetPongRoutes(router *gin.RouterGroup) {
-    pongGroup := router.Group("/pong")
-    {
-        pongGroup.GET("/", controllers.Pong)
-    }
+	pongGroup := router.Group("/pong")
+	pongGroup.GET("/", controllers.Pong)
 }
