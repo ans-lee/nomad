@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -45,8 +46,12 @@ func CheckSessionToken(c *gin.Context) {
 	update := bson.M{
 		"$set": bson.M{"expiry": primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC())},
 	}
+
 	_, err = db.GetCollection(SessionModel.CollectionName).
 		UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		log.Fatal("User token expiry did not refresh!")
+	}
 
 	c.Set("user", user.User)
 
