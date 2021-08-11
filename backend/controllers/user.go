@@ -20,6 +20,7 @@ import (
 const hashCost = 14
 const tokenChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 const tokenLength = 100
+const authHeader = "Authorization"
 
 func SignUp(c *gin.Context) {
 	var data UserModel.SignUpSchema
@@ -98,7 +99,7 @@ func LogIn(c *gin.Context) {
 	token := createSessionToken(tokenLength)
 	session := SessionModel.Session{
 		Token:  token,
-		Expiry: primitive.NewDateTimeFromTime(time.Now().UTC()),
+		Expiry: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC()),
 		User:   user.ID,
 	}
 
@@ -114,6 +115,27 @@ func LogIn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+	})
+}
+
+func LogOut(c *gin.Context) {
+	userID, _ := c.Get("user")
+	token := c.Request.Header[authHeader][0]
+	filter := bson.D{
+		{Key: "user", Value: userID},
+		{Key: "token", Value: token},
+	}
+
+	_, err := db.GetCollection(SessionModel.CollectionName).
+		DeleteOne(context.Background(), filter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Something went wrong! Please try again.",
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Successfully logged out!",
 	})
 }
 
