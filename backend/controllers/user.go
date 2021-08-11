@@ -49,10 +49,10 @@ func SignUp(c *gin.Context) {
 	}
 
 	newUser := UserModel.User{
-		Email: data.Email,
-		Password: hashedPassword,
+		Email:     data.Email,
+		Password:  hashedPassword,
 		FirstName: data.FirstName,
-		LastName: data.LastName,
+		LastName:  data.LastName,
 	}
 
 	_, err := db.GetCollection(UserModel.CollectionName).
@@ -97,9 +97,9 @@ func LogIn(c *gin.Context) {
 
 	token := createSessionToken(tokenLength)
 	session := SessionModel.Session{
-		Token: token,
+		Token:  token,
 		Expiry: primitive.NewDateTimeFromTime(time.Now().UTC()),
-		User: user.ID,
+		User:   user.ID,
 	}
 
 	_, err = db.GetCollection(SessionModel.CollectionName).
