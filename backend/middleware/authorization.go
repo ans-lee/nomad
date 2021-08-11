@@ -28,10 +28,7 @@ func CheckSessionToken(c *gin.Context) {
 
 	timeNow := primitive.NewDateTimeFromTime(time.Now().UTC())
 	token := c.Request.Header[authHeader][0]
-	filter := bson.D{
-		{Key: "token", Value: token},
-		{Key: "expiry", Value: bson.D{{Key: "$gt", Value: timeNow}}},
-	}
+	filter := bson.M{"token": token, "expiry": bson.M{"$gt": timeNow}}
 
 	err := db.GetCollection(SessionModel.CollectionName).
 		FindOne(context.Background(), filter).
@@ -44,15 +41,9 @@ func CheckSessionToken(c *gin.Context) {
 		return
 	}
 
-	filter = bson.D{{Key: "token", Value: token}}
-	update := bson.D{
-		{
-			Key: "$set",
-			Value: bson.D{{
-				Key: "expiry",
-				Value: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC()),
-			}},
-		},
+	filter = bson.M{"token": token}
+	update := bson.M{
+		"$set": bson.M{"expiry": primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC())},
 	}
 	_, err = db.GetCollection(SessionModel.CollectionName).
 		UpdateOne(context.Background(), filter, update)

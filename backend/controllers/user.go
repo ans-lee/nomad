@@ -83,7 +83,7 @@ func LogIn(c *gin.Context) {
 
 	var user UserModel.User
 
-	filter := bson.D{{Key: "email", Value: data.Email}}
+	filter := bson.M{"email": data.Email}
 	err := db.GetCollection(UserModel.CollectionName).
 		FindOne(context.Background(), filter).
 		Decode(&user)
@@ -121,10 +121,7 @@ func LogIn(c *gin.Context) {
 func LogOut(c *gin.Context) {
 	userID, _ := c.Get("user")
 	token := c.Request.Header[authHeader][0]
-	filter := bson.D{
-		{Key: "user", Value: userID},
-		{Key: "token", Value: token},
-	}
+	filter := bson.M{"user": userID, "token": token}
 
 	_, err := db.GetCollection(SessionModel.CollectionName).
 		DeleteOne(context.Background(), filter)
@@ -170,7 +167,7 @@ func createSessionToken(length int) string {
 func userExists(email string) bool {
 	var user UserModel.User
 
-	filter := bson.D{{Key: "email", Value: email}}
+	filter := bson.M{"email": email}
 
 	return db.GetCollection(UserModel.CollectionName).
 		FindOne(context.Background(), filter).
