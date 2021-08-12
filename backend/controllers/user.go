@@ -10,6 +10,7 @@ import (
 	"github.com/anslee/nomad/db"
 	SessionModel "github.com/anslee/nomad/models/session"
 	UserModel "github.com/anslee/nomad/models/user"
+	"github.com/anslee/nomad/serializers"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,7 +24,7 @@ const tokenLength = 100
 const authHeader = "Authorization"
 
 func SignUp(c *gin.Context) {
-	var data UserModel.SignUpSchema
+	var data serializers.SignUpSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Fields are not in the correct format.",
@@ -72,7 +73,7 @@ func SignUp(c *gin.Context) {
 }
 
 func LogIn(c *gin.Context) {
-	var data UserModel.LogInSchema
+	var data serializers.LogInSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Fields are not in the correct format.",
