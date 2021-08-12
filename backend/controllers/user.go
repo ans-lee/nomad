@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"context"
-	"crypto/rand"
-	"math/big"
 	"net/http"
 	"time"
 
@@ -12,10 +10,10 @@ import (
 	SessionModel "github.com/anslee/nomad/models/session"
 	UserModel "github.com/anslee/nomad/models/user"
 	"github.com/anslee/nomad/serializers"
+	"github.com/anslee/nomad/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/validator.v2"
 )
 
@@ -37,7 +35,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	hashedPassword := generatePasswordHash(data.Password)
+	hashedPassword := utils.GeneratePasswordHash(data.Password)
 	if hashedPassword == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Something went wrong! Please try again.",
@@ -85,7 +83,7 @@ func LogIn(c *gin.Context) {
 		FindOne(context.Background(), filter).
 		Decode(&user)
 
-	if err != nil || !comparePasswordHash(data.Password, user.Password) {
+	if err != nil || !utils.ComparePasswordHash(data.Password, user.Password) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Either password or email is incorrect.",
 		})
@@ -93,7 +91,7 @@ func LogIn(c *gin.Context) {
 		return
 	}
 
-	token := createSessionToken(AuthConstants.SessionTokenLength)
+	token := utils.CreateSessionToken(AuthConstants.SessionTokenLength)
 	session := SessionModel.Session{
 		Token:  token,
 		Expiry: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC()),
@@ -131,34 +129,6 @@ func LogOut(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully logged out!",
 	})
-}
-
-func generatePasswordHash(password string) string {
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), AuthConstants.HashCost)
-	if err != nil {
-		return ""
-	}
-
-	return string(hashPassword)
-}
-
-func comparePasswordHash(password, hash string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
-}
-
-func createSessionToken(length int) string {
-	result := make([]byte, length)
-
-	for i := 0; i < length; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(AuthConstants.SessionTokenLength)))
-		if err != nil {
-			return ""
-		}
-
-		result[i] = AuthConstants.SessionTokenChars[num.Int64()]
-	}
-
-	return string(result)
 }
 
 func userExists(email string) bool {
