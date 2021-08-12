@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	AuthConstants "github.com/anslee/nomad/constants/auth"
 	"github.com/anslee/nomad/db"
 	SessionModel "github.com/anslee/nomad/models/session"
 	"github.com/gin-gonic/gin"
@@ -13,12 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-const authHeader = "Authorization"
-
 func CheckSessionToken(c *gin.Context) {
 	var user SessionModel.Session
 
-	headerArr := c.Request.Header[authHeader]
+	headerArr := c.Request.Header[AuthConstants.AuthHeaderKey]
 	if len(headerArr) != 1 {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "You are not authorized.",
@@ -28,7 +27,7 @@ func CheckSessionToken(c *gin.Context) {
 	}
 
 	timeNow := primitive.NewDateTimeFromTime(time.Now().UTC())
-	token := c.Request.Header[authHeader][0]
+	token := headerArr[0]
 	filter := bson.M{"token": token, "expiry": bson.M{"$gt": timeNow}}
 
 	err := db.GetCollection(SessionModel.CollectionName).

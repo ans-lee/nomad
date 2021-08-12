@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	AuthConstants "github.com/anslee/nomad/constants/auth"
 	"github.com/anslee/nomad/db"
 	SessionModel "github.com/anslee/nomad/models/session"
 	UserModel "github.com/anslee/nomad/models/user"
@@ -17,11 +18,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/validator.v2"
 )
-
-const hashCost = 14
-const tokenChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
-const tokenLength = 100
-const authHeader = "Authorization"
 
 func SignUp(c *gin.Context) {
 	var data serializers.SignUpSchema
@@ -97,7 +93,7 @@ func LogIn(c *gin.Context) {
 		return
 	}
 
-	token := createSessionToken(tokenLength)
+	token := createSessionToken(AuthConstants.SessionTokenLength)
 	session := SessionModel.Session{
 		Token:  token,
 		Expiry: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC()),
@@ -121,7 +117,7 @@ func LogIn(c *gin.Context) {
 
 func LogOut(c *gin.Context) {
 	userID, _ := c.Get("user")
-	token := c.Request.Header[authHeader][0]
+	token := c.Request.Header[AuthConstants.AuthHeaderKey][0]
 	filter := bson.M{"user": userID, "token": token}
 
 	_, err := db.GetCollection(SessionModel.CollectionName).
@@ -138,7 +134,7 @@ func LogOut(c *gin.Context) {
 }
 
 func generatePasswordHash(password string) string {
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), hashCost)
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), AuthConstants.HashCost)
 	if err != nil {
 		return ""
 	}
@@ -154,12 +150,12 @@ func createSessionToken(length int) string {
 	result := make([]byte, length)
 
 	for i := 0; i < length; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(tokenChars))))
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(AuthConstants.SessionTokenLength)))
 		if err != nil {
 			return ""
 		}
 
-		result[i] = tokenChars[num.Int64()]
+		result[i] = AuthConstants.SessionTokenChars[num.Int64()]
 	}
 
 	return string(result)
