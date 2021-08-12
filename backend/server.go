@@ -49,16 +49,11 @@ func main() {
 func setupRoutes(router *gin.RouterGroup) {
 	routers.SetPongRoutes(router)
 	routers.SetAuthRoutes(router)
+	routers.SetEventRoutes(router)
 }
 
 func setupValidator() {
-	err := validator.SetValidationFunc(utils.ValidatorDatetimeTag, utils.ValidateRFC3339)
-	if err != nil {
-		log.Fatal("Could not set additional validator functions!", err)
-		os.Exit(1)
-	}
-
-	err = validator.SetValidationFunc(utils.ValidatorCategoryTag, utils.ValidateCategory)
+	err := validator.SetValidationFunc(utils.ValidatorCategoryTag, utils.ValidateCategory)
 	if err != nil {
 		log.Fatal("Could not set additional validator functions!", err)
 		os.Exit(1)

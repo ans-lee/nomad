@@ -114,7 +114,7 @@ func LogIn(c *gin.Context) {
 }
 
 func LogOut(c *gin.Context) {
-	userID, _ := c.Get("user")
+	userID, _ := primitive.ObjectIDFromHex(c.GetString("user"))
 	token := c.Request.Header[AuthConstants.AuthHeaderKey][0]
 	filter := bson.M{"user": userID, "token": token}
 

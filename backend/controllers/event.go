@@ -23,8 +23,23 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	start := getUTCDatetime(data.Start)
-	end := getUTCDatetime(data.End)
+	start, err := time.Parse(time.RFC3339, data.Start)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Start time must be in RFC3339 format",
+		})
+
+		return
+	}
+
+	end, err := time.Parse(time.RFC3339, data.End)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "End time must be in RFC3339 format",
+		})
+
+		return
+	}
 
 	if start.After(end) {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -34,45 +49,56 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
+	userID, _ := primitive.ObjectIDFromHex(c.GetString("user"))
 	newEvent := EventModel.Event{
 		Title:       data.Title,
 		Location:    data.Location,
-		Online:      data.Online,
+		Online:      *data.Online,
 		Description: data.Description,
 		Category:    data.Category,
-		Start:       primitive.NewDateTimeFromTime(start),
-		End:         primitive.NewDateTimeFromTime(end),
+		Start:       primitive.NewDateTimeFromTime(start.UTC()),
+		End:         primitive.NewDateTimeFromTime(end.UTC()),
 		Repeat:      data.Repeat,
 		Visibility:  data.Visibility,
+		CreatedBy:   userID,
 	}
 
 	if data.Reminder != "" {
-		reminder := getUTCDatetime(data.Reminder)
-		if reminder.After(start) {
+		reminder, reminderErr := time.Parse(time.RFC3339, data.Reminder)
+		if reminderErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Reminder time cannot be after the start time.",
+				"error": "Reminder time must be in RFC3339 format",
 			})
 
 			return
 		}
 
-		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder)
+		if reminder.After(start) || reminder.Equal(start) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Reminder time cannot be the same or after the start time.",
+			})
+
+			return
+		}
+
+		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder.UTC())
 	}
 
 	if data.GroupID != "" {
-		objID, err := primitive.ObjectIDFromHex(data.GroupID)
-		if err != nil {
+		// TODO check if valid groupID
+		groupID, groupErr := primitive.ObjectIDFromHex(data.GroupID)
+		if groupErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Something went wrong! Please try again.",
+				"error": "Invalid Group ID",
 			})
 
 			return
 		}
 
-		newEvent.GroupID = objID
+		newEvent.GroupID = groupID
 	}
 
-	_, err := db.GetCollection(EventModel.CollectionName).
+	_, err = db.GetCollection(EventModel.CollectionName).
 		InsertOne(context.Background(), newEvent)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -82,12 +108,8 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
+	// TODO maybe return the link of the event?
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Created a new user!",
+		"message": "Created a new event!",
 	})
-}
-
-func getUTCDatetime(rfc3339Time string) time.Time {
-	timeObj, _ := time.Parse(time.RFC3339, rfc3339Time)
-	return timeObj
 }

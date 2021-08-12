@@ -7,15 +7,15 @@ const CollectionName = "event"
 type Event struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
 	Title       string             `bson:"title"`
-	Location    string             `bson:"location"`
+	Location    string             `bson:"location,omitempty"`
 	Online      bool               `bson:"online"`
-	Description string             `bson:"description"`
-	Category    string             `bson:"type"`
+	Description string             `bson:"description,omitempty"`
+	Category    string             `bson:"category"`
 	Start       primitive.DateTime `bson:"start"`
 	End         primitive.DateTime `bson:"end"`
-	Reminder    primitive.DateTime `bson:"reminder"`
+	Reminder    primitive.DateTime `bson:"reminder,omitempty"`
 	Repeat      string             `bson:"repeat"`
 	Visibility  string             `bson:"visibility"`
-	GroupID     primitive.ObjectID `bson:"groupID"`
+	GroupID     primitive.ObjectID `bson:"groupID,omitempty"`
 	CreatedBy   primitive.ObjectID `bson:"createdBy"`
 }
