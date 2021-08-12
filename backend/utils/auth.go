@@ -25,7 +25,7 @@ func CreateSessionToken(length int) string {
 	result := make([]byte, length)
 
 	for i := 0; i < length; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(AuthConstants.SessionTokenLength)))
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(AuthConstants.SessionTokenChars))))
 		if err != nil {
 			return ""
 		}
