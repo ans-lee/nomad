@@ -10,4 +10,5 @@ type User struct {
 	Password  string             `bson:"password"`
 	FirstName string             `bson:"firstName"`
 	LastName  string             `bson:"lastName"`
+	CreatedOn primitive.DateTime `bson:"createdOn"`
 }

@@ -49,6 +49,7 @@ func SignUp(c *gin.Context) {
 		Password:  hashedPassword,
 		FirstName: data.FirstName,
 		LastName:  data.LastName,
+		CreatedOn: primitive.NewDateTimeFromTime(time.Now().UTC()),
 	}
 
 	_, err := db.GetCollection(UserModel.CollectionName).
