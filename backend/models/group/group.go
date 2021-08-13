@@ -6,7 +6,7 @@ const CollectionName = "group"
 
 type Group struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Name        string             `bson:"title"`
+	Name        string             `bson:"name"`
 	Description string             `bson:"description,omitempty"`
-	Visibility  string             `bson:"visibility"`
+	IsPublic    bool               `bson:"isPublic"`
 }

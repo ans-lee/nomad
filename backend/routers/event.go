@@ -7,6 +7,6 @@ import (
 )
 
 func SetEventRoutes(router *gin.RouterGroup) {
-	authGroup := router.Group("/event")
-	authGroup.POST("/create", middleware.CheckSessionToken, controllers.CreateEvent)
+	eventGroup := router.Group("/event")
+	eventGroup.POST("/create", middleware.CheckSessionToken, controllers.CreateEvent)
 }
