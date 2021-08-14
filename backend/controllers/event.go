@@ -112,14 +112,25 @@ func EditEvent(c *gin.Context) {
 
 	updatedFields := bson.D{
 		{Key: "title", Value: data.Title},
-		{Key: "location", Value: data.Location},
 		{Key: "online", Value: data.Online},
-		{Key: "description", Value: data.Description},
 		{Key: "category", Value: data.Category},
 		{Key: "start", Value: primitive.NewDateTimeFromTime(start.UTC())},
 		{Key: "end", Value: primitive.NewDateTimeFromTime(end.UTC())},
 		{Key: "repeat", Value: data.Repeat},
 		{Key: "visibility", Value: data.Visibility},
+	}
+	removeFields := bson.D{}
+
+	if data.Location == "" {
+		removeFields = append(removeFields, bson.E{Key: "location", Value: ""})
+	} else {
+		updatedFields = append(updatedFields, bson.E{Key: "location", Value: data.Location})
+	}
+
+	if data.Description == "" {
+		removeFields = append(removeFields, bson.E{Key: "description", Value: ""})
+	} else {
+		updatedFields = append(updatedFields, bson.E{Key: "description", Value: data.Description})
 	}
 
 	if data.Reminder != "" {
@@ -137,13 +148,11 @@ func EditEvent(c *gin.Context) {
 			bson.E{Key: "reminder", Value: primitive.NewDateTimeFromTime(reminder.UTC())},
 		)
 	} else {
-		updatedFields = append(
-			updatedFields,
-			bson.E{Key: "reminder", Value: ""},
-		)
+		removeFields = append(removeFields, bson.E{Key: "reminder", Value: ""})
 	}
 
-	filter := bson.M{"_id": c.Param("id")}
+	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": eventID}
 
 	_, err := db.GetCollection(EventModel.CollectionName).
 		UpdateOne(
@@ -151,6 +160,7 @@ func EditEvent(c *gin.Context) {
 			filter,
 			bson.D{
 				{Key: "$set", Value: updatedFields},
+				{Key: "$unset", Value: removeFields},
 			},
 		)
 	if err != nil {
