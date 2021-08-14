@@ -9,7 +9,7 @@ type CreateEventSchema struct {
 	Start       string `json:"start" binding:"required"`
 	End         string `json:"end" binding:"required"`
 	Reminder    string `json:"reminder"`
-	Repeat      string `json:"repeat" binding:"required" validate:"regexp=^(none|day|week|month|year)$"` // nolint:lll
+	Repeat      string `json:"repeat" binding:"required" validate:"regexp=^(none|day|week|month|year)$"`   // nolint:lll
 	Visibility  string `json:"visibility" binding:"required" validate:"regexp=^(public|private|friends)$"` // nolint:lll
 	GroupID     string `json:"groupID" validate:"min=0,max=24"`
 }
@@ -23,6 +23,6 @@ type EditEventSchema struct {
 	Start       string `json:"start" binding:"required"`
 	End         string `json:"end" binding:"required"`
 	Reminder    string `json:"reminder"`
-	Repeat      string `json:"repeat" binding:"required" validate:"regexp=^(none|day|week|month|year)$"` // nolint:lll
+	Repeat      string `json:"repeat" binding:"required" validate:"regexp=^(none|day|week|month|year)$"`   // nolint:lll
 	Visibility  string `json:"visibility" binding:"required" validate:"regexp=^(public|private|friends)$"` // nolint:lll
 }
