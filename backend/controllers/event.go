@@ -26,27 +26,10 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	start, err := time.Parse(time.RFC3339, data.Start)
-	if err != nil {
+	start, end, errStr := getStartEndTimes(data.Start, data.End)
+	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Start time must be in RFC3339 format",
-		})
-
-		return
-	}
-
-	end, err := time.Parse(time.RFC3339, data.End)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "End time must be in RFC3339 format",
-		})
-
-		return
-	}
-
-	if start.After(end) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Start time cannot be after the end time.",
+			"error": errStr,
 		})
 
 		return
@@ -67,18 +50,10 @@ func CreateEvent(c *gin.Context) {
 	}
 
 	if data.Reminder != "" {
-		reminder, reminderErr := time.Parse(time.RFC3339, data.Reminder)
-		if reminderErr != nil {
+		reminder, errStr := getReminderTime(data.Reminder, start)
+		if errStr != "" {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Reminder time must be in RFC3339 format",
-			})
-
-			return
-		}
-
-		if reminder.After(start) || reminder.Equal(start) {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Reminder time cannot be the same or after the start time.",
+				"error": errStr,
 			})
 
 			return
@@ -115,6 +90,37 @@ func CreateEvent(c *gin.Context) {
 	})
 }
 
+func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr string) {
+	start, err := time.Parse(time.RFC3339, startStr)
+	if err != nil {
+		return start, start, "Start time must be in RFC3339 format."
+	}
+
+	end, err = time.Parse(time.RFC3339, endStr)
+	if err != nil {
+		return start, end, "End time must be in RFC3339 format."
+	}
+
+	if start.After(end) {
+		return start, end, "Start time cannot be after the end time."
+	}
+
+	return start, end, ""
+}
+
+func getReminderTime(reminderStr string, startTime time.Time) (reminder time.Time, errStr string) {
+	reminder, err := time.Parse(time.RFC3339, reminderStr)
+	if err != nil {
+		return reminder, "Reminder time must be in RFC3339 format."
+	}
+
+	if reminder.After(startTime) || reminder.Equal(startTime) {
+		return reminder, "Reminder time cannot be the same or after the start time."
+	}
+
+	return reminder, ""
+}
+
 func getGroupID(idStr string) (primitive.ObjectID, error) {
 	groupID, err := primitive.ObjectIDFromHex(idStr)
 	if err != nil {
@@ -122,6 +128,7 @@ func getGroupID(idStr string) (primitive.ObjectID, error) {
 	}
 
 	var group GroupModel.Group
+
 	filter := bson.M{"_id": groupID}
 
 	err = db.GetCollection(GroupModel.CollectionName).
