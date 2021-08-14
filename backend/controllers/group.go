@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	AuthConstants "github.com/anslee/nomad/constants/auth"
 	GroupMemberConstants "github.com/anslee/nomad/constants/group_member"
 	"github.com/anslee/nomad/db"
 	GroupModel "github.com/anslee/nomad/models/group"
@@ -29,7 +30,7 @@ func CreateGroup(c *gin.Context) {
 		Description: data.Description,
 		IsPublic: *data.IsPublic,
 	}
-	userID, _ := primitive.ObjectIDFromHex(c.GetString("user"))
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
 
 	insertResult, err := db.GetCollection(GroupModel.CollectionName).
 		InsertOne(context.Background(), newGroup)
@@ -43,7 +44,7 @@ func CreateGroup(c *gin.Context) {
 
 	newGroupMember := GroupMemberModel.GroupMember{
 		Role: GroupMemberConstants.RoleOwner,
-		UserID: userID,
+		UserID: userID.(primitive.ObjectID),
 		GroupID: insertResult.InsertedID.(primitive.ObjectID),
 	}
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	AuthConstants "github.com/anslee/nomad/constants/auth"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
 	"github.com/anslee/nomad/serializers"
@@ -49,7 +50,7 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	userID, _ := primitive.ObjectIDFromHex(c.GetString("user"))
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
 	newEvent := EventModel.Event{
 		Title:       data.Title,
 		Location:    data.Location,
@@ -60,7 +61,7 @@ func CreateEvent(c *gin.Context) {
 		End:         primitive.NewDateTimeFromTime(end.UTC()),
 		Repeat:      data.Repeat,
 		Visibility:  data.Visibility,
-		CreatedBy:   userID,
+		CreatedBy:   userID.(primitive.ObjectID),
 	}
 
 	if data.Reminder != "" {

@@ -52,7 +52,7 @@ func CheckSessionToken(c *gin.Context) {
 		log.Fatal("User token expiry did not refresh!")
 	}
 
-	c.Set("user", user.User.Hex())
+	c.Set(AuthConstants.ContextAuthKey, user.User)
 
 	c.Next()
 }
