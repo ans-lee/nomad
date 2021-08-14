@@ -1,4 +1,4 @@
-package group_member
+package groupmember
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 

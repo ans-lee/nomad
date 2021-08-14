@@ -1,4 +1,4 @@
-package group_member
+package groupmember
 
 const (
 	RoleMember    = "member"

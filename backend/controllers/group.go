@@ -26,9 +26,9 @@ func CreateGroup(c *gin.Context) {
 	}
 
 	newGroup := GroupModel.Group{
-		Name: data.Name,
+		Name:        data.Name,
 		Description: data.Description,
-		IsPublic: *data.IsPublic,
+		IsPublic:    *data.IsPublic,
 	}
 	userID, _ := c.Get(AuthConstants.ContextAuthKey)
 
@@ -43,8 +43,8 @@ func CreateGroup(c *gin.Context) {
 	}
 
 	newGroupMember := GroupMemberModel.GroupMember{
-		Role: GroupMemberConstants.RoleOwner,
-		UserID: userID.(primitive.ObjectID),
+		Role:    GroupMemberConstants.RoleOwner,
+		UserID:  userID.(primitive.ObjectID),
 		GroupID: result.InsertedID.(primitive.ObjectID),
 	}
 
