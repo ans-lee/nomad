@@ -32,7 +32,7 @@ func CreateGroup(c *gin.Context) {
 	}
 	userID, _ := c.Get(AuthConstants.ContextAuthKey)
 
-	insertResult, err := db.GetCollection(GroupModel.CollectionName).
+	result, err := db.GetCollection(GroupModel.CollectionName).
 		InsertOne(context.Background(), newGroup)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -45,7 +45,7 @@ func CreateGroup(c *gin.Context) {
 	newGroupMember := GroupMemberModel.GroupMember{
 		Role: GroupMemberConstants.RoleOwner,
 		UserID: userID.(primitive.ObjectID),
-		GroupID: insertResult.InsertedID.(primitive.ObjectID),
+		GroupID: result.InsertedID.(primitive.ObjectID),
 	}
 
 	_, err = db.GetCollection(GroupMemberModel.CollectionName).
@@ -59,6 +59,6 @@ func CreateGroup(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Created a new group!",
+		"groupID": result.InsertedID,
 	})
 }
