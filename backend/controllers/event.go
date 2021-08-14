@@ -8,8 +8,10 @@ import (
 	AuthConstants "github.com/anslee/nomad/constants/auth"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
+	GroupModel "github.com/anslee/nomad/models/group"
 	"github.com/anslee/nomad/serializers"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gopkg.in/validator.v2"
 )
@@ -86,8 +88,7 @@ func CreateEvent(c *gin.Context) {
 	}
 
 	if data.GroupID != "" {
-		// TODO check if valid groupID
-		groupID, groupErr := primitive.ObjectIDFromHex(data.GroupID)
+		groupID, groupErr := getGroupID(data.GroupID)
 		if groupErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Invalid Group ID",
@@ -99,7 +100,7 @@ func CreateEvent(c *gin.Context) {
 		newEvent.GroupID = groupID
 	}
 
-	_, err = db.GetCollection(EventModel.CollectionName).
+	result, err := db.GetCollection(EventModel.CollectionName).
 		InsertOne(context.Background(), newEvent)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -109,8 +110,26 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	// TODO maybe return the link of the event?
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Created a new event!",
+		"eventID": result.InsertedID,
 	})
+}
+
+func getGroupID(idStr string) (primitive.ObjectID, error) {
+	groupID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return groupID, err
+	}
+
+	var group GroupModel.Group
+	filter := bson.M{"_id": groupID}
+
+	err = db.GetCollection(GroupModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&group)
+	if err != nil {
+		return groupID, err
+	}
+
+	return groupID, nil
 }
