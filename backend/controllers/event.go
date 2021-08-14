@@ -62,6 +62,7 @@ func CreateEvent(c *gin.Context) {
 		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder.UTC())
 	}
 
+	// TODO check if user has permissions to add an event to the project
 	if data.GroupID != "" {
 		groupID, groupErr := getGroupID(data.GroupID)
 		if groupErr != nil {
@@ -87,6 +88,81 @@ func CreateEvent(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"eventID": result.InsertedID,
+	})
+}
+
+func EditEvent(c *gin.Context) {
+	var data serializers.EditEventSchema
+	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Fields are not in the correct format.",
+		})
+
+		return
+	}
+
+	start, end, errStr := getStartEndTimes(data.Start, data.End)
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": errStr,
+		})
+
+		return
+	}
+
+	updatedFields := bson.D{
+		{Key: "title", Value: data.Title},
+		{Key: "location", Value: data.Location},
+		{Key: "online", Value: data.Online},
+		{Key: "description", Value: data.Description},
+		{Key: "category", Value: data.Category},
+		{Key: "start", Value: primitive.NewDateTimeFromTime(start.UTC())},
+		{Key: "end", Value: primitive.NewDateTimeFromTime(end.UTC())},
+		{Key: "repeat", Value: data.Repeat},
+		{Key: "visibility", Value: data.Visibility},
+	}
+
+	if data.Reminder != "" {
+		reminder, errStr := getReminderTime(data.Reminder, start)
+		if errStr != "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": errStr,
+			})
+
+			return
+		}
+
+		updatedFields = append(
+			updatedFields,
+			bson.E{Key: "reminder", Value: primitive.NewDateTimeFromTime(reminder.UTC())},
+		)
+	} else {
+		updatedFields = append(
+			updatedFields,
+			bson.E{Key: "reminder", Value: ""},
+		)
+	}
+
+	filter := bson.M{"_id": c.Param("id")}
+
+	_, err := db.GetCollection(EventModel.CollectionName).
+		UpdateOne(
+			context.Background(),
+			filter,
+			bson.D{
+				{Key: "$set", Value: updatedFields},
+			},
+		)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Something went wrong! Please try again.",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Event updated!",
 	})
 }
 

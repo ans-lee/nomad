@@ -4,7 +4,6 @@ const (
 	VisibilityPublic  = "public"
 	VisibilityPrivate = "private"
 	VisibilityFriends = "friends"
-	VisibilityGroup   = "group"
 )
 
 const (

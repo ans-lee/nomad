@@ -9,4 +9,5 @@ import (
 func SetEventRoutes(router *gin.RouterGroup) {
 	eventGroup := router.Group("/event")
 	eventGroup.POST("/create", middleware.CheckSessionToken, controllers.CreateEvent)
+	eventGroup.PUT("/:id/edit", middleware.CheckSessionToken, controllers.EditEvent)
 }
