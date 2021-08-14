@@ -6,9 +6,12 @@ import (
 	"time"
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
+	EventConstants "github.com/anslee/nomad/constants/event"
+	GroupMemberConstants "github.com/anslee/nomad/constants/group_member"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
 	GroupModel "github.com/anslee/nomad/models/group"
+	GroupMemberModel "github.com/anslee/nomad/models/group_member"
 	"github.com/anslee/nomad/serializers"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,12 +65,27 @@ func CreateEvent(c *gin.Context) {
 		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder.UTC())
 	}
 
-	// TODO check if user has permissions to add an event to the project
 	if data.GroupID != "" {
 		groupID, groupErr := getGroupID(data.GroupID)
 		if groupErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Invalid Group ID",
+				"error": "Invalid Group ID.",
+			})
+
+			return
+		}
+
+		if !userHasPermission(userID.(primitive.ObjectID)) {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "You do not have permission to create an event on this group.",
+			})
+
+			return
+		}
+
+		if data.Visibility == EventConstants.VisibilityFriends {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Visibility cannot be set to friends if event is created on a group.",
 			})
 
 			return
@@ -225,4 +243,15 @@ func getGroupID(idStr string) (primitive.ObjectID, error) {
 	}
 
 	return groupID, nil
+}
+
+func userHasPermission(userID primitive.ObjectID) bool {
+	var groupMember GroupMemberModel.GroupMember
+	filter := bson.M{"userID": userID}
+
+	err := db.GetCollection(GroupModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&groupMember)
+
+	return err != nil || groupMember.Role == GroupMemberConstants.RoleMember
 }
