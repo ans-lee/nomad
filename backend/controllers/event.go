@@ -212,6 +212,38 @@ func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr str
 	return start, end, ""
 }
 
+func GetEvent(c *gin.Context) {
+	var event EventModel.Event
+
+	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": eventID}
+
+	err := db.GetCollection(EventModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&event)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid Event ID.",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"title": event.Title,
+		"location": event.Location,
+		"online": event.Online,
+		"description": event.Description,
+		"category": event.Category,
+		"start": event.Start,
+		"end": event.End,
+		"reminder": event.Reminder,
+		"repeat": event.Repeat,
+		"visibility": event.Visibility,
+		"groupID": event.GroupID,
+	})
+}
+
 func getReminderTime(reminderStr string, startTime time.Time) (reminder time.Time, errStr string) {
 	reminder, err := time.Parse(time.RFC3339, reminderStr)
 	if err != nil {
