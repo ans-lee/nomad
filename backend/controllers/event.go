@@ -250,17 +250,23 @@ func GetEvent(c *gin.Context) {
 		return
 	}
 
-	userID, exists := c.Get(AuthConstants.ContextAuthKey)
 
 	// TODO account for friends later
 	if event.Visibility == EventConstants.VisibilityPrivate {
-		if !exists || !userHasPermission(userID.(primitive.ObjectID), event.GroupID) {
+		userID, exists := c.Get(AuthConstants.ContextAuthKey)
+
+		if exists && !userCanGetEvent(userID.(primitive.ObjectID), event.GroupID) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "You do not have permission to view this event.",
 			})
 
 			return
 		}
+	}
+
+	groupIDStr := ""
+	if !event.GroupID.IsZero() {
+		groupIDStr = event.GroupID.Hex()
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -274,7 +280,7 @@ func GetEvent(c *gin.Context) {
 		"reminder": event.Reminder.Time().UTC(),
 		"repeat": event.Repeat,
 		"visibility": event.Visibility,
-		"groupID": event.GroupID,
+		"groupID": groupIDStr,
 	})
 }
 
@@ -331,4 +337,16 @@ func userHasPermission(userID, groupID primitive.ObjectID) bool {
 		Decode(&groupMember)
 
 	return err != nil || groupMember.Role == GroupMemberConstants.RoleMember
+}
+
+func userCanGetEvent(userID, groupID primitive.ObjectID) bool {
+	if groupID.IsZero() {
+		return true
+	}
+
+	if !userHasPermission(userID, groupID) {
+		return false
+	}
+
+	return true
 }
