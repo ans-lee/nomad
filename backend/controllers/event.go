@@ -64,6 +64,7 @@ func CreateEvent(c *gin.Context) {
 		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder.UTC())
 	}
 
+	// TODO Prevent event from being public if group is private
 	if data.GroupID != "" {
 		groupID, groupErr := getGroupID(data.GroupID)
 		if groupErr != nil {
@@ -127,6 +128,7 @@ func EditEvent(c *gin.Context) {
 		return
 	}
 
+	// TODO Prevent event from being public if group is private
 	updatedFields := bson.D{
 		{Key: "title", Value: data.Title},
 		{Key: "online", Value: data.Online},
@@ -211,6 +213,8 @@ func GetEvent(c *gin.Context) {
 	}
 
 	// TODO account for friends later
+	// TODO what to do if group is private? prevent outside users from
+	// viewing the event regardless of whether the event is public or not
 	if event.Visibility == EventConstants.VisibilityPrivate {
 		userID, exists := c.Get(AuthConstants.ContextAuthKey)
 
