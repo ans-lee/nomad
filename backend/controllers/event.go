@@ -7,12 +7,11 @@ import (
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
 	EventConstants "github.com/anslee/nomad/constants/event"
-	GroupMemberConstants "github.com/anslee/nomad/constants/group_member"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
 	GroupModel "github.com/anslee/nomad/models/group"
-	GroupMemberModel "github.com/anslee/nomad/models/group_member"
 	"github.com/anslee/nomad/serializers"
+	"github.com/anslee/nomad/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -75,7 +74,7 @@ func CreateEvent(c *gin.Context) {
 			return
 		}
 
-		if !userHasPermission(userID.(primitive.ObjectID), groupID) {
+		if !utils.UserInGroup(userID.(primitive.ObjectID), groupID) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "You do not have permission to create an event on this group.",
 			})
@@ -328,23 +327,12 @@ func getGroupID(idStr string) (primitive.ObjectID, error) {
 	return groupID, nil
 }
 
-func userHasPermission(userID, groupID primitive.ObjectID) bool {
-	var groupMember GroupMemberModel.GroupMember
-	filter := bson.M{"userID": userID, "groupID": groupID}
-
-	err := db.GetCollection(GroupModel.CollectionName).
-		FindOne(context.Background(), filter).
-		Decode(&groupMember)
-
-	return err != nil || groupMember.Role == GroupMemberConstants.RoleMember
-}
-
 func userCanGetEvent(userID, groupID primitive.ObjectID) bool {
 	if groupID.IsZero() {
 		return true
 	}
 
-	if !userHasPermission(userID, groupID) {
+	if !utils.UserInGroup(userID, groupID) {
 		return false
 	}
 
