@@ -9,5 +9,10 @@ import (
 func SetPongRoutes(router *gin.RouterGroup) {
 	pongGroup := router.Group("/pong")
 	pongGroup.GET("/", controllers.Pong)
-	pongGroup.GET("/auth", middleware.CheckSessionToken, controllers.Pong)
+	pongGroup.GET(
+		"/auth",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.Pong,
+	)
 }

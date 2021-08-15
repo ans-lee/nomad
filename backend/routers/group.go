@@ -8,5 +8,10 @@ import (
 
 func SetGroupRoutes(router *gin.RouterGroup) {
 	groupGroup := router.Group("/group")
-	groupGroup.POST("/create", middleware.CheckSessionToken, controllers.CreateGroup)
+	groupGroup.POST(
+		"/create",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.CreateGroup,
+	)
 }

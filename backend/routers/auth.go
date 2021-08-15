@@ -10,5 +10,10 @@ func SetAuthRoutes(router *gin.RouterGroup) {
 	authGroup := router.Group("/auth")
 	authGroup.POST("/signup", controllers.SignUp)
 	authGroup.POST("/login", controllers.LogIn)
-	authGroup.POST("/logout", middleware.CheckSessionToken, controllers.LogOut)
+	authGroup.POST(
+		"/logout",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.LogOut,
+	)
 }

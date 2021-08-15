@@ -19,10 +19,6 @@ func CheckSessionToken(c *gin.Context) {
 
 	headerArr := c.Request.Header[AuthConstants.AuthHeaderKey]
 	if len(headerArr) != 1 {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "You are not authorized.",
-		})
-
 		return
 	}
 
@@ -35,7 +31,7 @@ func CheckSessionToken(c *gin.Context) {
 		Decode(&user)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-			"error": "You are not authorized.",
+			"error": "Invalid token.",
 		})
 
 		return
@@ -55,4 +51,13 @@ func CheckSessionToken(c *gin.Context) {
 	c.Set(AuthConstants.ContextAuthKey, user.User)
 
 	c.Next()
+}
+
+func AuthRequired(c *gin.Context) {
+	_, exists := c.Get(AuthConstants.ContextAuthKey)
+	if !exists {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "You are not authorized.",
+		})
+	}
 }

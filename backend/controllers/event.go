@@ -75,7 +75,7 @@ func CreateEvent(c *gin.Context) {
 			return
 		}
 
-		if !userHasPermission(userID.(primitive.ObjectID)) {
+		if !userHasPermission(userID.(primitive.ObjectID), groupID) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "You do not have permission to create an event on this group.",
 			})
@@ -250,6 +250,19 @@ func GetEvent(c *gin.Context) {
 		return
 	}
 
+	userID, exists := c.Get(AuthConstants.ContextAuthKey)
+
+	// TODO account for friends later
+	if event.Visibility == EventConstants.VisibilityPrivate {
+		if !exists || !userHasPermission(userID.(primitive.ObjectID), event.GroupID) {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "You do not have permission to view this event.",
+			})
+
+			return
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"title": event.Title,
 		"location": event.Location,
@@ -309,9 +322,9 @@ func getGroupID(idStr string) (primitive.ObjectID, error) {
 	return groupID, nil
 }
 
-func userHasPermission(userID primitive.ObjectID) bool {
+func userHasPermission(userID, groupID primitive.ObjectID) bool {
 	var groupMember GroupMemberModel.GroupMember
-	filter := bson.M{"userID": userID}
+	filter := bson.M{"userID": userID, "groupID": groupID}
 
 	err := db.GetCollection(GroupModel.CollectionName).
 		FindOne(context.Background(), filter).
