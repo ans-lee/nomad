@@ -210,7 +210,6 @@ func GetEvent(c *gin.Context) {
 		return
 	}
 
-
 	// TODO account for friends later
 	if event.Visibility == EventConstants.VisibilityPrivate {
 		userID, exists := c.Get(AuthConstants.ContextAuthKey)
@@ -230,17 +229,17 @@ func GetEvent(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"title": event.Title,
-		"location": event.Location,
-		"online": event.Online,
+		"title":       event.Title,
+		"location":    event.Location,
+		"online":      event.Online,
 		"description": event.Description,
-		"category": event.Category,
-		"start": event.Start.Time().UTC(),
-		"end": event.End.Time().UTC(),
-		"reminder": event.Reminder.Time().UTC(),
-		"repeat": event.Repeat,
-		"visibility": event.Visibility,
-		"groupID": groupIDStr,
+		"category":    event.Category,
+		"start":       event.Start.Time().UTC(),
+		"end":         event.End.Time().UTC(),
+		"reminder":    event.Reminder.Time().UTC(),
+		"repeat":      event.Repeat,
+		"visibility":  event.Visibility,
+		"groupID":     groupIDStr,
 	})
 }
 

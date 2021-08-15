@@ -3,8 +3,8 @@ package utils
 import (
 	"context"
 
-	GroupModel "github.com/anslee/nomad/models/group"
 	"github.com/anslee/nomad/db"
+	GroupModel "github.com/anslee/nomad/models/group"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

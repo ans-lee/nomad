@@ -94,8 +94,8 @@ func GetGroup(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"name": group.Name,
+		"name":        group.Name,
 		"description": group.Description,
-		"isPublic": group.IsPublic,
+		"isPublic":    group.IsPublic,
 	})
 }
