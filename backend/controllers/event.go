@@ -172,7 +172,7 @@ func EditEvent(c *gin.Context) {
 	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
 	filter := bson.M{"_id": eventID}
 
-	_, err := db.GetCollection(EventModel.CollectionName).
+	result, err := db.GetCollection(EventModel.CollectionName).
 		UpdateOne(
 			context.Background(),
 			filter,
@@ -181,9 +181,9 @@ func EditEvent(c *gin.Context) {
 				{Key: "$unset", Value: removeFields},
 			},
 		)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+	if err != nil || result.MatchedCount == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid Event ID.",
 		})
 
 		return
