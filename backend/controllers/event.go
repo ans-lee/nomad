@@ -209,6 +209,27 @@ func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr str
 		return start, end, "Start time cannot be after the end time."
 	}
 
+	start = time.Date(
+		start.Year(),
+		start.Month(),
+		start.Day(),
+		start.Hour(),
+		start.Minute(),
+		0,
+		0,
+		start.Location(),
+	)
+	end = time.Date(
+		end.Year(),
+		end.Month(),
+		end.Day(),
+		end.Hour(),
+		end.Minute(),
+		0,
+		0,
+		end.Location(),
+	)
+
 	return start, end, ""
 }
 
@@ -235,9 +256,9 @@ func GetEvent(c *gin.Context) {
 		"online": event.Online,
 		"description": event.Description,
 		"category": event.Category,
-		"start": event.Start,
-		"end": event.End,
-		"reminder": event.Reminder,
+		"start": event.Start.Time().UTC(),
+		"end": event.End.Time().UTC(),
+		"reminder": event.Reminder.Time().UTC(),
 		"repeat": event.Repeat,
 		"visibility": event.Visibility,
 		"groupID": event.GroupID,
@@ -253,6 +274,17 @@ func getReminderTime(reminderStr string, startTime time.Time) (reminder time.Tim
 	if reminder.After(startTime) || reminder.Equal(startTime) {
 		return reminder, "Reminder time cannot be the same or after the start time."
 	}
+
+	reminder = time.Date(
+		reminder.Year(),
+		reminder.Month(),
+		reminder.Day(),
+		reminder.Hour(),
+		reminder.Minute(),
+		0,
+		0,
+		reminder.Location(),
+	)
 
 	return reminder, ""
 }
