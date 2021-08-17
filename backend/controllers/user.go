@@ -30,9 +30,9 @@ func GetUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"email": user.Email,
+		"email":     user.Email,
 		"firstName": user.FirstName,
-		"lastName": user.LastName,
+		"lastName":  user.LastName,
 	})
 }
 
@@ -54,8 +54,8 @@ func GetUserMyself(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"email": user.Email,
+		"email":     user.Email,
 		"firstName": user.FirstName,
-		"lastName": user.LastName,
+		"lastName":  user.LastName,
 	})
 }
