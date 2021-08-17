@@ -149,7 +149,7 @@ func EditEvent(c *gin.Context) {
 	if !event.GroupID.IsZero() {
 		userID, _ := c.Get(AuthConstants.ContextAuthKey)
 
-		if !userCanAccessEvent(userID.(primitive.ObjectID), event.GroupID) {
+		if !utils.UserInGroup(userID.(primitive.ObjectID), event.GroupID) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "You do not have permission to edit the event.",
 			})
