@@ -14,5 +14,11 @@ func SetGroupRoutes(router *gin.RouterGroup) {
 		middleware.AuthRequired,
 		controllers.CreateGroup,
 	)
+	groupGroup.PUT(
+		"/:id",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.EditGroup,
+	)
 	groupGroup.GET("/:id", middleware.CheckSessionToken, controllers.GetGroup)
 }

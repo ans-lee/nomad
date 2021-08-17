@@ -65,6 +65,69 @@ func CreateGroup(c *gin.Context) {
 	})
 }
 
+func EditGroup(c *gin.Context) {
+	var data serializers.CreateGroupSchema
+	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Fields are not in the correct format.",
+		})
+
+		return
+	}
+
+	var group GroupModel.Group
+
+	groupID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": groupID}
+
+	err := db.GetCollection(GroupModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&group)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid Group ID.",
+		})
+
+		return
+	}
+
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+
+	if !utils.UserHasPermission(userID.(primitive.ObjectID), groupID) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not have permission to edit the group.",
+		})
+
+		return
+	}
+
+	updateFields := bson.D{
+		{Key: "name", Value: data.Name},
+		{Key: "isPublic", Value: data.IsPublic},
+	}
+	removeFields := bson.D{}
+
+	if data.Description == "" {
+		removeFields = append(removeFields, bson.E{Key: "description", Value: ""})
+	} else {
+		updateFields = append(updateFields, bson.E{Key: "description", Value: data.Description})
+	}
+
+	_, _ = db.GetCollection(GroupModel.CollectionName).
+		UpdateOne(
+			context.Background(),
+			filter,
+			bson.D{
+				{Key: "$set", Value: updateFields},
+				{Key: "$unset", Value: removeFields},
+			},
+		)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Group updated!",
+	})
+}
+
 func GetGroup(c *gin.Context) {
 	var group GroupModel.Group
 

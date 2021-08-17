@@ -147,6 +147,16 @@ func EditEvent(c *gin.Context) {
 	}
 
 	if !event.GroupID.IsZero() {
+		userID, _ := c.Get(AuthConstants.ContextAuthKey)
+
+		if !userCanAccessEvent(userID.(primitive.ObjectID), event.GroupID) {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "You do not have permission to edit the event.",
+			})
+
+			return
+		}
+
 		if !groupIsPublic(event.GroupID) && data.Visibility != EventConstants.VisibilityPrivate {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Event can only be private if the group is private.",
@@ -156,7 +166,7 @@ func EditEvent(c *gin.Context) {
 		}
 	}
 
-	updatedFields := bson.D{
+	updateFields := bson.D{
 		{Key: "title", Value: data.Title},
 		{Key: "online", Value: data.Online},
 		{Key: "category", Value: data.Category},
@@ -170,13 +180,13 @@ func EditEvent(c *gin.Context) {
 	if data.Location == "" {
 		removeFields = append(removeFields, bson.E{Key: "location", Value: ""})
 	} else {
-		updatedFields = append(updatedFields, bson.E{Key: "location", Value: data.Location})
+		updateFields = append(updateFields, bson.E{Key: "location", Value: data.Location})
 	}
 
 	if data.Description == "" {
 		removeFields = append(removeFields, bson.E{Key: "description", Value: ""})
 	} else {
-		updatedFields = append(updatedFields, bson.E{Key: "description", Value: data.Description})
+		updateFields = append(updateFields, bson.E{Key: "description", Value: data.Description})
 	}
 
 	if data.Reminder != "" {
@@ -189,8 +199,8 @@ func EditEvent(c *gin.Context) {
 			return
 		}
 
-		updatedFields = append(
-			updatedFields,
+		updateFields = append(
+			updateFields,
 			bson.E{Key: "reminder", Value: primitive.NewDateTimeFromTime(reminder.UTC())},
 		)
 	} else {
@@ -202,7 +212,7 @@ func EditEvent(c *gin.Context) {
 			context.Background(),
 			filter,
 			bson.D{
-				{Key: "$set", Value: updatedFields},
+				{Key: "$set", Value: updateFields},
 				{Key: "$unset", Value: removeFields},
 			},
 		)
@@ -233,7 +243,7 @@ func GetEvent(c *gin.Context) {
 	if event.Visibility == EventConstants.VisibilityPrivate {
 		userID, exists := c.Get(AuthConstants.ContextAuthKey)
 
-		if exists && !userCanGetEvent(userID.(primitive.ObjectID), event.GroupID) {
+		if !exists || !userCanAccessEvent(userID.(primitive.ObjectID), event.GroupID) {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "You do not have permission to view this event.",
 			})
@@ -360,7 +370,7 @@ func groupIsPublic(groupID primitive.ObjectID) bool {
 	return group.IsPublic
 }
 
-func userCanGetEvent(userID, groupID primitive.ObjectID) bool {
+func userCanAccessEvent(userID, groupID primitive.ObjectID) bool {
 	if groupID.IsZero() {
 		return true
 	}
