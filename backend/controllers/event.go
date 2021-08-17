@@ -64,7 +64,6 @@ func CreateEvent(c *gin.Context) {
 		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder.UTC())
 	}
 
-	// TODO Prevent event from being public if group is private
 	if data.GroupID != "" {
 		groupID, groupErr := getGroupID(data.GroupID)
 		if groupErr != nil {
@@ -89,6 +88,9 @@ func CreateEvent(c *gin.Context) {
 			})
 
 			return
+		} else if data.Visibility == EventConstants.VisibilityPublic && !groupIsPublic(groupID) {
+			// Event is private if group is private
+			newEvent.Visibility = EventConstants.VisibilityPrivate
 		}
 
 		newEvent.GroupID = groupID
@@ -128,7 +130,32 @@ func EditEvent(c *gin.Context) {
 		return
 	}
 
-	// TODO Prevent event from being public if group is private
+	var event EventModel.Event
+
+	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": eventID}
+
+	err := db.GetCollection(EventModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&event)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid Event ID.",
+		})
+
+		return
+	}
+
+	if !event.GroupID.IsZero() {
+		if !groupIsPublic(event.GroupID) && data.Visibility != EventConstants.VisibilityPrivate {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Event can only be private if the group is private.",
+			})
+
+			return
+		}
+	}
+
 	updatedFields := bson.D{
 		{Key: "title", Value: data.Title},
 		{Key: "online", Value: data.Online},
@@ -170,10 +197,7 @@ func EditEvent(c *gin.Context) {
 		removeFields = append(removeFields, bson.E{Key: "reminder", Value: ""})
 	}
 
-	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
-	filter := bson.M{"_id": eventID}
-
-	result, err := db.GetCollection(EventModel.CollectionName).
+	_, _ = db.GetCollection(EventModel.CollectionName).
 		UpdateOne(
 			context.Background(),
 			filter,
@@ -182,13 +206,6 @@ func EditEvent(c *gin.Context) {
 				{Key: "$unset", Value: removeFields},
 			},
 		)
-	if err != nil || result.MatchedCount == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid Event ID.",
-		})
-
-		return
-	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Event updated!",
@@ -213,8 +230,6 @@ func GetEvent(c *gin.Context) {
 	}
 
 	// TODO account for friends later
-	// TODO what to do if group is private? prevent outside users from
-	// viewing the event regardless of whether the event is public or not
 	if event.Visibility == EventConstants.VisibilityPrivate {
 		userID, exists := c.Get(AuthConstants.ContextAuthKey)
 
@@ -328,6 +343,21 @@ func getGroupID(idStr string) (primitive.ObjectID, error) {
 	}
 
 	return groupID, nil
+}
+
+func groupIsPublic(groupID primitive.ObjectID) bool {
+	var group GroupModel.Group
+
+	filter := bson.M{"_id": groupID}
+
+	err := db.GetCollection(GroupModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&group)
+	if err != nil {
+		return false
+	}
+
+	return group.IsPublic
 }
 
 func userCanGetEvent(userID, groupID primitive.ObjectID) bool {
