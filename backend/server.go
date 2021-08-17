@@ -48,6 +48,7 @@ func main() {
 
 func setupRoutes(router *gin.RouterGroup) {
 	routers.SetPongRoutes(router)
+	routers.SetUserRoutes(router)
 	routers.SetAuthRoutes(router)
 	routers.SetEventRoutes(router)
 	routers.SetGroupRoutes(router)
