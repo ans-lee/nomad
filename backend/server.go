@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/anslee/nomad/db"
@@ -40,6 +41,9 @@ func main() {
 
 	setupRoutes(api)
 
+	// Use a handler for no route found
+	router.NoRoute(setup404)
+
 	if err = router.Run(); err != nil {
 		log.Fatal("Could not start gin-gonic server!", err)
 		os.Exit(1)
@@ -60,4 +64,10 @@ func setupValidator() {
 		log.Fatal("Could not set additional validator functions!", err)
 		os.Exit(1)
 	}
+}
+
+func setup404(c *gin.Context) {
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": "404 not found.",
+	})
 }
