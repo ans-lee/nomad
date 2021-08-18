@@ -7,6 +7,7 @@ import (
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
 	EventConstants "github.com/anslee/nomad/constants/event"
+	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
 	GroupModel "github.com/anslee/nomad/models/group"
@@ -22,7 +23,7 @@ func CreateEvent(c *gin.Context) {
 	var data serializers.CreateEventSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Fields are not in the correct format.",
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
 		})
 
 		return
@@ -68,7 +69,7 @@ func CreateEvent(c *gin.Context) {
 		groupID, groupErr := getGroupID(data.GroupID)
 		if groupErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Invalid Group ID.",
+				"error": ResponseConstants.InvalidGroupIDMessage,
 			})
 
 			return
@@ -100,7 +101,7 @@ func CreateEvent(c *gin.Context) {
 		InsertOne(context.Background(), newEvent)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -115,7 +116,7 @@ func EditEvent(c *gin.Context) {
 	var data serializers.EditEventSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Fields are not in the correct format.",
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
 		})
 
 		return
@@ -140,7 +141,7 @@ func EditEvent(c *gin.Context) {
 		Decode(&event)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid Event ID.",
+			"error": ResponseConstants.InvalidEventIDMessage,
 		})
 
 		return
@@ -233,7 +234,7 @@ func GetEvent(c *gin.Context) {
 		Decode(&event)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid Event ID.",
+			"error": ResponseConstants.InvalidEventIDMessage,
 		})
 
 		return

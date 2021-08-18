@@ -6,6 +6,7 @@ import (
 	"time"
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
+	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	SessionModel "github.com/anslee/nomad/models/session"
 	UserModel "github.com/anslee/nomad/models/user"
@@ -21,7 +22,7 @@ func SignUp(c *gin.Context) {
 	var data serializers.SignUpSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Fields are not in the correct format.",
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
 		})
 
 		return
@@ -38,7 +39,7 @@ func SignUp(c *gin.Context) {
 	hashedPassword := utils.GeneratePasswordHash(data.Password)
 	if hashedPassword == "" {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -56,7 +57,7 @@ func SignUp(c *gin.Context) {
 		InsertOne(context.Background(), newUser)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -71,7 +72,7 @@ func LogIn(c *gin.Context) {
 	var data serializers.LogInSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Fields are not in the correct format.",
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
 		})
 
 		return
@@ -103,7 +104,7 @@ func LogIn(c *gin.Context) {
 		InsertOne(context.Background(), session)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -123,7 +124,7 @@ func LogOut(c *gin.Context) {
 		DeleteOne(context.Background(), filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 	}
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
+	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	UserModel "github.com/anslee/nomad/models/user"
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ func GetUser(c *gin.Context) {
 		Decode(&user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid User ID.",
+			"error": ResponseConstants.InvalidUserIDMessage,
 		})
 
 		return
@@ -47,7 +48,7 @@ func GetUserMyself(c *gin.Context) {
 		Decode(&user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid User ID.",
+			"error": ResponseConstants.InvalidUserIDMessage,
 		})
 
 		return

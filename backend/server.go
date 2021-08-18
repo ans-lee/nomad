@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	"github.com/anslee/nomad/routers"
 	"github.com/anslee/nomad/utils"
@@ -68,6 +69,6 @@ func setupValidator() {
 
 func setup404(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{
-		"error": "404 not found.",
+		"error": ResponseConstants.NotFoundErrorMessage,
 	})
 }

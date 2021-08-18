@@ -6,6 +6,7 @@ import (
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
 	GroupMemberConstants "github.com/anslee/nomad/constants/group_member"
+	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	GroupModel "github.com/anslee/nomad/models/group"
 	GroupMemberModel "github.com/anslee/nomad/models/group_member"
@@ -21,7 +22,7 @@ func CreateGroup(c *gin.Context) {
 	var data serializers.CreateGroupSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Fields are not in the correct format.",
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
 		})
 
 		return
@@ -38,7 +39,7 @@ func CreateGroup(c *gin.Context) {
 		InsertOne(context.Background(), newGroup)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -54,7 +55,7 @@ func CreateGroup(c *gin.Context) {
 		InsertOne(context.Background(), newGroupMember)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Something went wrong! Please try again.",
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -69,7 +70,7 @@ func EditGroup(c *gin.Context) {
 	var data serializers.CreateGroupSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Fields are not in the correct format.",
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
 		})
 
 		return
@@ -85,7 +86,7 @@ func EditGroup(c *gin.Context) {
 		Decode(&group)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid Group ID.",
+			"error": ResponseConstants.InvalidGroupIDMessage,
 		})
 
 		return
@@ -139,7 +140,7 @@ func GetGroup(c *gin.Context) {
 		Decode(&group)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid Group ID.",
+			"error": ResponseConstants.InvalidGroupIDMessage,
 		})
 
 		return
