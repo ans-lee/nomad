@@ -83,13 +83,7 @@ func CreateEvent(c *gin.Context) {
 			return
 		}
 
-		if data.Visibility == EventConstants.VisibilityFriends {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Visibility cannot be set to friends if event is created on a group.",
-			})
-
-			return
-		} else if data.Visibility == EventConstants.VisibilityPublic && !groupIsPublic(groupID) {
+		if data.Visibility == EventConstants.VisibilityPublic && !groupIsPublic(groupID) {
 			// Event is private if group is private
 			newEvent.Visibility = EventConstants.VisibilityPrivate
 		}

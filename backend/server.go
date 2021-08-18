@@ -56,7 +56,7 @@ func setupRoutes(router *gin.RouterGroup) {
 	routers.SetUserRoutes(router)
 	routers.SetAuthRoutes(router)
 	routers.SetEventRoutes(router)
-	routers.SetGroupRoutes(router)
+	// routers.SetGroupRoutes(router)
 }
 
 func setupValidator() {
