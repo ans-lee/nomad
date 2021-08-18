@@ -3,7 +3,6 @@ package event
 const (
 	VisibilityPublic  = "public"
 	VisibilityPrivate = "private"
-	VisibilityFriends = "friends"
 )
 
 const (
