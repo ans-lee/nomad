@@ -21,7 +21,6 @@ module.exports = {
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
-        pathRewrite: { '^/api': '' },
         secure: false,
       }
     },
@@ -31,7 +30,16 @@ module.exports = {
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-react',
+              '@babel/preset-typescript',
+            ],
+          },
+        },
       },
       {
         test: /\.s[ac]css/,
