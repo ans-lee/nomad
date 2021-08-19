@@ -4,6 +4,7 @@ tags
 
 # React
 node_modules
+build/
 
 # Air (hot reload)
 tmp

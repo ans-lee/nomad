@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 const app = (
   <div>
-    Hello World
+    <div>Hello World</div>
   </div>
 );
 
