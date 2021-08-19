@@ -2,5 +2,8 @@
 *.swp
 tags
 
+# React
+node_modules
+
 # Air (hot reload)
 tmp
