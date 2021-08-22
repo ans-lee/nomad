@@ -12,8 +12,11 @@ module.exports = {
     filename: '[name].js',
   },
   resolve: {
+    alias: {
+      src: path.resolve(__dirname, './src'),
+    },
     modules: [path.join(__dirname, 'src'), 'node_modules'],
-    extensions: ['*', '.js', '.jsx', '.ts', '.tsx']
+    extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
   },
   devServer: {
     historyApiFallback: true,
@@ -22,7 +25,7 @@ module.exports = {
       '/api': {
         target: 'http://localhost:5000',
         secure: false,
-      }
+      },
     },
   },
   module: {

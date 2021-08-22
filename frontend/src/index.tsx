@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const app = (
+const App = (
   <div>
     <div>Hello World</div>
   </div>
 );
 
-ReactDOM.render(app, document.getElementById('root'));
+ReactDOM.render(App, document.getElementById('root'));
