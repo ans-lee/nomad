@@ -36,23 +36,19 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [
-              '@babel/preset-env',
-              '@babel/preset-react',
-              '@babel/preset-typescript',
-            ],
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
           },
         },
       },
       {
-        test: /\.s[ac]css/,
+        test: /\.(scss|css)/,
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
         test: /\.(jpe?g|png|svg|gif|ico)$/,
         type: 'asset/resource',
       },
-    ]
+    ],
   },
   optimization: {
     minimize: true,
@@ -79,5 +75,5 @@ module.exports = {
     new ESLintPlugin({
       extensions: ['js', 'jsx', 'ts', 'tsx'],
     }),
-  ]
+  ],
 };
