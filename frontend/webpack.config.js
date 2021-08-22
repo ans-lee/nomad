@@ -41,8 +41,8 @@ module.exports = {
         },
       },
       {
-        test: /\.(scss|css)/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        test: /\.css/,
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.(jpe?g|png|svg|gif|ico)$/,
