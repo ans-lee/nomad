@@ -16,7 +16,7 @@ const Input: React.FC<InputProps> = ({ id, label, required, register, ...rest })
     <input
       {...register(id, { required })}
       {...rest}
-      className="w-full mt-2 mb-4 px-3.5 py-1 outline-none rounded-md border border-black"
+      className="w-full mt-2 mb-4 px-3.5 py-1 outline-none rounded-md border border-gray-300"
     />
   </>
 );

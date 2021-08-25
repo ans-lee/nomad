@@ -21,11 +21,11 @@ const links = [
 const authLinks = [
   {
     name: 'Login',
-    link: '/',
+    link: '/login',
   },
   {
     name: 'Sign Up',
-    link: '/',
+    link: '/signup',
   },
 ];
 
