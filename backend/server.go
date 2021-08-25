@@ -45,7 +45,8 @@ func main() {
 	// Use a handler for no route found
 	router.NoRoute(setup404)
 
-	if err = router.Run(); err != nil {
+	// Start the server
+	if err = router.Run(":5000"); err != nil {
 		log.Fatal("Could not start gin-gonic server!", err)
 		os.Exit(1)
 	}
