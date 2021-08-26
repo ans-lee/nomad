@@ -40,3 +40,21 @@ export async function userSignUp(
   }
   return response.json();
 }
+
+export async function userLogin(email: string, password: string): Promise<DefaultResponse> {
+  const response = await fetch(`${API_PATH}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: email,
+      password: password,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}

@@ -22,15 +22,18 @@ const SignUpForm: React.FC = () => {
     watch,
   } = useForm<Inputs>();
   const password = watch('password');
-  const mutation = useMutation((data: Inputs) => userSignUp(data.email, data.password, data.firstName, data.lastName), {
-    onError: (err: FetchError) => {
-      if (err.res.status === 409) {
-        setErrMsg('A user with this email already exists');
-      } else {
-        setErrMsg('Something went wrong! Please try again');
-      }
-    },
-  });
+  const mutation = useMutation(
+    ({ email, password, firstName, lastName }: Inputs) => userSignUp(email, password, firstName, lastName),
+    {
+      onError: (err: FetchError) => {
+        if (err.res.status === 409) {
+          setErrMsg('A user with this email already exists');
+        } else {
+          setErrMsg('Something went wrong! Please try again');
+        }
+      },
+    }
+  );
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
@@ -45,7 +48,7 @@ const SignUpForm: React.FC = () => {
         id="firstName"
         label="First Name *"
         validation={{ required: true, maxLength: 128 }}
-        error={!!errors.firstName}
+        error={'firstName' in errors}
         register={register}
       />
       {errors.firstName && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
@@ -58,7 +61,7 @@ const SignUpForm: React.FC = () => {
         id="lastName"
         label="Last Name *"
         validation={{ required: true, maxLength: 128 }}
-        error={!!errors.lastName}
+        error={'lastName' in errors}
         register={register}
       />
       {errors.lastName && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
@@ -74,7 +77,7 @@ const SignUpForm: React.FC = () => {
           required: true,
           validate: (value: string) => value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/) !== null,
         }}
-        error={!!errors.email}
+        error={'email' in errors}
         register={register}
       />
       {errors.email?.type === 'required' && (
@@ -87,7 +90,7 @@ const SignUpForm: React.FC = () => {
         id="password"
         label="Password *"
         validation={{ required: true, minLength: 8, maxLength: 128 }}
-        error={!!errors.password}
+        error={'password' in errors}
         register={register}
       />
       {errors.password?.type === 'required' && (
@@ -108,7 +111,7 @@ const SignUpForm: React.FC = () => {
           required: true,
           validate: (value: string) => value === password,
         }}
-        error={!!errors.confirmPassword}
+        error={'confirmPassword' in errors}
         register={register}
       />
       {errors.confirmPassword?.type === 'required' && (

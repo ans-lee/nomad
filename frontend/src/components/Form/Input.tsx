@@ -31,11 +31,7 @@ const Input: React.FC<InputProps> = ({ id, label, validation, error, register, .
       <label htmlFor={id} className="block">
         {label}
       </label>
-      <input
-        {...register(id, validation)}
-        {...rest}
-        className={classes}
-      />
+      <input {...register(id, validation)} {...rest} className={classes} />
     </>
   );
 };
