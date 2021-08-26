@@ -45,6 +45,7 @@ const SignUpForm: React.FC = () => {
         id="firstName"
         label="First Name *"
         validation={{ required: true, maxLength: 128 }}
+        error={!!errors.firstName}
         register={register}
       />
       {errors.firstName && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
@@ -57,6 +58,7 @@ const SignUpForm: React.FC = () => {
         id="lastName"
         label="Last Name *"
         validation={{ required: true, maxLength: 128 }}
+        error={!!errors.lastName}
         register={register}
       />
       {errors.lastName && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
@@ -72,6 +74,7 @@ const SignUpForm: React.FC = () => {
           required: true,
           validate: (value: string) => value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/) !== null,
         }}
+        error={!!errors.email}
         register={register}
       />
       {errors.email?.type === 'required' && (
@@ -84,6 +87,7 @@ const SignUpForm: React.FC = () => {
         id="password"
         label="Password *"
         validation={{ required: true, minLength: 8, maxLength: 128 }}
+        error={!!errors.password}
         register={register}
       />
       {errors.password?.type === 'required' && (
@@ -104,6 +108,7 @@ const SignUpForm: React.FC = () => {
           required: true,
           validate: (value: string) => value === password,
         }}
+        error={!!errors.confirmPassword}
         register={register}
       />
       {errors.confirmPassword?.type === 'required' && (

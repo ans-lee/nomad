@@ -13,8 +13,8 @@ const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<Inputs> = (data) => alert(JSON.stringify(data));
 
   return (
-    <div className="h-screen w-80 m-auto flex flex-col justify-center">
-      <div className="rounded-md border border-gray-300 p-4 bg-gray-100">
+    <div className="h-screen w-screen m-auto flex flex-col justify-center sm:w-96">
+      <div className="h-screen rounded-md border border-gray-300 p-4 bg-gray-100 sm:h-auto">
         <h1 className="text-4xl text-center mb-4">Login</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input type="text" id="email" label="Email" register={register} />
