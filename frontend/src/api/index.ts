@@ -4,6 +4,12 @@ interface DefaultResponse {
   message: string;
 }
 
+export class FetchError extends Error {
+  constructor(public res: Response, message?: string) {
+    super(message);
+  }
+}
+
 export async function getPong(): Promise<DefaultResponse> {
   return fetch(`${API_PATH}/pong`, {
     method: 'GET',
@@ -16,7 +22,7 @@ export async function userSignUp(
   firstName: string,
   lastName: string
 ): Promise<DefaultResponse> {
-  return fetch(`${API_PATH}/auth/signup`, {
+  const response = await fetch(`${API_PATH}/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,5 +33,10 @@ export async function userSignUp(
       firstName: firstName,
       lastName: lastName,
     }),
-  }).then((res) => res.json());
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
 }
