@@ -13,7 +13,7 @@ const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<Inputs> = (data) => alert(JSON.stringify(data));
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center">
+    <div className="h-screen w-80 m-auto flex flex-col justify-center">
       <div className="rounded-md border border-gray-300 p-4 bg-gray-100">
         <h1 className="text-4xl text-center mb-4">Login</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
