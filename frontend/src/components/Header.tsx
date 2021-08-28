@@ -10,7 +10,7 @@ const links = [
   },
   {
     name: 'Create Event',
-    link: '/',
+    link: '/event/create',
   },
   {
     name: 'About',
