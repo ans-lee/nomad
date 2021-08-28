@@ -1,5 +1,6 @@
 package serializers
 
+// TODO change visibility to boolean, remove repeat? maybe
 type CreateEventSchema struct {
 	Title       string `json:"title" binding:"required" validate:"min=1,max=255"`
 	Location    string `json:"location" validate:"min=0,max=255"`

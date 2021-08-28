@@ -2,14 +2,14 @@ import classNames from 'classnames';
 import React, { InputHTMLAttributes } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface ToggleSwitchProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
   label: string;
   enabled: boolean;
   register: UseFormRegister<any>; // eslint-disable-line
 }
 
-const ToggleSwitch: React.FC<InputProps> = ({ id, label, enabled, register, ...rest }) => {
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ id, label, enabled, register, ...rest }) => {
   const backgroundClasses = classNames(
     'h-8',
     'w-14',

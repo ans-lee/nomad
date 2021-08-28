@@ -1,6 +1,9 @@
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Input from 'src/components/Form/Input';
+import { OPTIONS, REPEAT } from 'src/constants/EventConstants';
+import Select from './Select';
+import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
 
 type Inputs = {
@@ -13,7 +16,7 @@ type Inputs = {
   end: string;
   reminder: string;
   repeat: string;
-  visibility: string;
+  isPrivate: boolean;
 };
 
 const CreateEventForm: React.FC = () => {
@@ -24,6 +27,7 @@ const CreateEventForm: React.FC = () => {
     watch,
   } = useForm<Inputs>({ defaultValues: { online: true } });
   const isOnline = watch('online');
+  const isPrivate = watch('isPrivate');
   const onSubmit: SubmitHandler<Inputs> = (data) => alert(JSON.stringify(data));
 
   return (
@@ -47,27 +51,28 @@ const CreateEventForm: React.FC = () => {
         error={'location' in errors}
         register={register}
       />
-      {errors.location && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
       {errors.location?.type === 'maxLength' && (
         <div className="text-sm text-red-500 -mt-2 mb-2">Location is too long</div>
       )}
 
       <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
 
-      <Input
-        type="text"
+      <TextArea
         id="description"
         label="Description"
         validation={{ maxLength: 512 }}
         error={'description' in errors}
         register={register}
       />
-      {errors.description?.type === 'required' && (
-        <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>
-      )}
       {errors.description?.type === 'maxLength' && (
         <div className="text-sm text-red-500 -mt-2 mb-2">Description is too long</div>
       )}
+
+      <Select id="category" label="Category" register={register} options={OPTIONS} />
+
+      <Select id="repeat" label="Repeat" register={register} options={REPEAT} />
+
+      <ToggleSwitch id="isPrivate" label="Private" enabled={isPrivate} register={register} />
 
       <button
         type="submit"
