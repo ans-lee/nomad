@@ -1,5 +1,6 @@
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
 import { OPTIONS, REPEAT } from 'src/constants/EventConstants';
 import Select from './Select';
@@ -12,18 +13,21 @@ type Inputs = {
   online: boolean;
   description: string;
   category: string;
-  start: string;
-  end: string;
-  reminder: string;
+  start: Date;
+  end: Date;
   repeat: string;
   isPrivate: boolean;
 };
 
+// TODO validate that start date is today onwards and that
+// end date is not before start
+// TODO google places autocomplete for location
 const CreateEventForm: React.FC = () => {
   const {
     register,
     formState: { errors },
     handleSubmit,
+    control,
     watch,
   } = useForm<Inputs>({ defaultValues: { online: true } });
   const isOnline = watch('online');
@@ -69,6 +73,24 @@ const CreateEventForm: React.FC = () => {
       )}
 
       <Select id="category" label="Category" register={register} options={OPTIONS} />
+
+      <DatePicker
+        id="start"
+        label="Start Time *"
+        validation={{ required: true }}
+        error={'start' in errors}
+        control={control}
+      />
+      {errors.start && <div className="text-sm text-red-500 -mt-2 mb-2">You must pick a start time</div>}
+
+      <DatePicker
+        id="end"
+        label="End Time *"
+        validation={{ required: true }}
+        error={'end' in errors}
+        control={control}
+      />
+      {errors.end && <div className="text-sm text-red-500 -mt-2 mb-2">You must pick an end time</div>}
 
       <Select id="repeat" label="Repeat" register={register} options={REPEAT} />
 
