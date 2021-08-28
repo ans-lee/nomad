@@ -4,6 +4,10 @@ interface DefaultResponse {
   message: string;
 }
 
+interface LoginResponse {
+  token: string;
+}
+
 export class FetchError extends Error {
   constructor(public res: Response, message?: string) {
     super(message);
@@ -41,7 +45,7 @@ export async function userSignUp(
   return response.json();
 }
 
-export async function userLogin(email: string, password: string): Promise<DefaultResponse> {
+export async function userLogin(email: string, password: string): Promise<LoginResponse> {
   const response = await fetch(`${API_PATH}/auth/login`, {
     method: 'POST',
     headers: {

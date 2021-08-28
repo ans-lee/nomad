@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
 import { FetchError, userLogin } from 'src/api';
+import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
 import Alert from 'src/components/Alert';
 import Input from 'src/components/Form/Input';
 
@@ -18,7 +19,9 @@ const LoginForm: React.FC = () => {
     handleSubmit,
   } = useForm<Inputs>();
   const mutation = useMutation(({ email, password }: Inputs) => userLogin(email, password), {
-    // Need to add the token to the cookies or session
+    onSuccess: (data) => {
+      window.localStorage.setItem(LOGIN_TOKEN_NAME, data.token);
+    },
     onError: (err: FetchError) => {
       if (err.res.status === 400) {
         setErrMsg('Incorrect password or email');
