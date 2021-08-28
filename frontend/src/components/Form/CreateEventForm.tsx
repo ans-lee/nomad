@@ -1,6 +1,7 @@
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Input from 'src/components/Form/Input';
+import ToggleSwitch from './ToggleSwitch';
 
 type Inputs = {
   title: string;
@@ -20,8 +21,10 @@ const CreateEventForm: React.FC = () => {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = (data) => alert(data);
+    watch,
+  } = useForm<Inputs>({ defaultValues: { online: true } });
+  const isOnline = watch('online');
+  const onSubmit: SubmitHandler<Inputs> = (data) => alert(JSON.stringify(data));
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -48,6 +51,8 @@ const CreateEventForm: React.FC = () => {
       {errors.location?.type === 'maxLength' && (
         <div className="text-sm text-red-500 -mt-2 mb-2">Location is too long</div>
       )}
+
+      <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
 
       <Input
         type="text"
