@@ -45,8 +45,10 @@ const DatePicker: React.FC<DatePickerProps> = ({ id, label, validation, error, c
             dateFormat="Pp"
             timeIntervals={5}
             showTimeInput={true}
+            minDate={new Date()}
             placeholderText="Pick a time..."
             showPopperArrow={false}
+            isClearable={true}
             className={classes}
           />
         )}

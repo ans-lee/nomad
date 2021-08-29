@@ -15,13 +15,13 @@ type Inputs = {
   category: string;
   start: Date;
   end: Date;
-  repeat: string;
   isPrivate: boolean;
 };
 
 // TODO validate that start date is today onwards and that
 // end date is not before start
 // TODO google places autocomplete for location
+// TODO remove repeat
 const CreateEventForm: React.FC = () => {
   const {
     register,
@@ -31,6 +31,7 @@ const CreateEventForm: React.FC = () => {
     watch,
   } = useForm<Inputs>({ defaultValues: { online: true } });
   const isOnline = watch('online');
+  const startTime = watch('start');
   const isPrivate = watch('isPrivate');
   const onSubmit: SubmitHandler<Inputs> = (data) => alert(JSON.stringify(data));
 
@@ -86,11 +87,15 @@ const CreateEventForm: React.FC = () => {
       <DatePicker
         id="end"
         label="End Time *"
-        validation={{ required: true }}
+        validation={{
+          required: true,
+          validate: (value: Date) => value.getTime() >= startTime.getTime(),
+        }}
         error={'end' in errors}
         control={control}
       />
-      {errors.end && <div className="text-sm text-red-500 -mt-2 mb-2">You must pick an end time</div>}
+      {errors.end?.type === 'required' && <div className="text-sm text-red-500 -mt-2 mb-2">You must pick an end time</div>}
+      {errors.end?.type === 'validate' && <div className="text-sm text-red-500 -mt-2 mb-2">End time must be the same or after the start time</div>}
 
       <Select id="repeat" label="Repeat" register={register} options={REPEAT} />
 
