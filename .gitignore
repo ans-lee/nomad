@@ -8,3 +8,6 @@ build/
 
 # Air (hot reload)
 tmp
+
+# dotenv file
+.env
