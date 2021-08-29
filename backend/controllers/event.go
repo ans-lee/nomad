@@ -12,10 +12,12 @@ import (
 	EventModel "github.com/anslee/nomad/models/event"
 	GroupModel "github.com/anslee/nomad/models/group"
 	"github.com/anslee/nomad/serializers"
+	"github.com/anslee/nomad/service/gmap"
 	"github.com/anslee/nomad/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"googlemaps.github.io/maps"
 	"gopkg.in/validator.v2"
 )
 
@@ -264,6 +266,28 @@ func GetEvent(c *gin.Context) {
 		"repeat":      event.Repeat,
 		"visibility":  event.Visibility,
 		"groupID":     groupIDStr,
+	})
+}
+
+func GetLocationSuggestions(c *gin.Context) {
+	req := &maps.PlaceAutocompleteRequest{
+		Input: c.Query("input"),
+	}
+
+	locations, err := gmap.GetClient().PlaceAutocomplete(context.Background(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
+	}
+
+	var result []string
+	for i := 0; i < len(locations.Predictions); i++ {
+		result = append(result, locations.Predictions[i].Description)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"locations": result,
 	})
 }
 

@@ -9,6 +9,7 @@ import (
 	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	"github.com/anslee/nomad/routers"
+	"github.com/anslee/nomad/service/gmap"
 	"github.com/anslee/nomad/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -23,6 +24,9 @@ func main() {
 		log.Fatal("Error loading .env file!")
 		os.Exit(1)
 	}
+
+	// Setup Google Maps client
+	gmap.SetupClient()
 
 	// Connect to MongoDB
 	db.ConnectDB()
@@ -53,11 +57,12 @@ func main() {
 }
 
 func setupRoutes(router *gin.RouterGroup) {
+	// Disable Group routes for now
+	// routers.SetGroupRoutes(router) // nolint:gocritic
 	routers.SetPongRoutes(router)
 	routers.SetUserRoutes(router)
 	routers.SetAuthRoutes(router)
 	routers.SetEventRoutes(router)
-	// routers.SetGroupRoutes(router)
 }
 
 func setupValidator() {
