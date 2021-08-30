@@ -1,7 +1,9 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+require('dotenv').config()
 
 module.exports = {
   mode: 'development',
@@ -66,6 +68,7 @@ module.exports = {
     },
   },
   plugins: [
+    new webpack.EnvironmentPlugin(['GOOGLE_API_KEY']),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'index.html'),
     }),

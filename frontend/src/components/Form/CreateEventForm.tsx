@@ -1,8 +1,9 @@
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
-import { OPTIONS, REPEAT } from 'src/constants/EventConstants';
+import { OPTIONS } from 'src/constants/EventConstants';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
@@ -29,6 +30,7 @@ const CreateEventForm: React.FC = () => {
     handleSubmit,
     control,
     watch,
+    setValue,
   } = useForm<Inputs>({ defaultValues: { online: true } });
   const isOnline = watch('online');
   const startTime = watch('start');
@@ -48,17 +50,7 @@ const CreateEventForm: React.FC = () => {
       {errors.title && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
       {errors.title?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">Title is too long</div>}
 
-      <Input
-        type="text"
-        id="location"
-        label="Location"
-        validation={{ maxLength: 128 }}
-        error={'location' in errors}
-        register={register}
-      />
-      {errors.location?.type === 'maxLength' && (
-        <div className="text-sm text-red-500 -mt-2 mb-2">Location is too long</div>
-      )}
+      <LocationAutocomplete id="location" label="Location" control={control} setValue={setValue} />
 
       <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
 
@@ -94,10 +86,12 @@ const CreateEventForm: React.FC = () => {
         error={'end' in errors}
         control={control}
       />
-      {errors.end?.type === 'required' && <div className="text-sm text-red-500 -mt-2 mb-2">You must pick an end time</div>}
-      {errors.end?.type === 'validate' && <div className="text-sm text-red-500 -mt-2 mb-2">End time must be the same or after the start time</div>}
-
-      <Select id="repeat" label="Repeat" register={register} options={REPEAT} />
+      {errors.end?.type === 'required' && (
+        <div className="text-sm text-red-500 -mt-2 mb-2">You must pick an end time</div>
+      )}
+      {errors.end?.type === 'validate' && (
+        <div className="text-sm text-red-500 -mt-2 mb-2">End time must be the same or after the start time</div>
+      )}
 
       <ToggleSwitch id="isPrivate" label="Private" enabled={isPrivate} register={register} />
 

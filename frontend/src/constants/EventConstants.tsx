@@ -52,26 +52,3 @@ export const OPTIONS = [
     value: 'other',
   },
 ];
-
-export const REPEAT = [
-  {
-    text: 'None',
-    value: 'none',
-  },
-  {
-    text: 'Every day',
-    value: 'day',
-  },
-  {
-    text: 'Every week',
-    value: 'week',
-  },
-  {
-    text: 'Every month',
-    value: 'month',
-  },
-  {
-    text: 'Every year',
-    value: 'year',
-  },
-];
