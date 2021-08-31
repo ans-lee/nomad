@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import DatePicker from 'src/components/Form/DatePicker';
@@ -7,6 +7,9 @@ import { OPTIONS } from 'src/constants/EventConstants';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
+import { useMutation } from 'react-query';
+import { createEvent, FetchError } from 'src/api';
+import Alert from 'src/components/Alert';
 
 type Inputs = {
   title: string;
@@ -19,11 +22,8 @@ type Inputs = {
   isPrivate: boolean;
 };
 
-// TODO validate that start date is today onwards and that
-// end date is not before start
-// TODO google places autocomplete for location
-// TODO remove repeat
 const CreateEventForm: React.FC = () => {
+  const [errMsg, setErrMsg] = useState('');
   const {
     register,
     formState: { errors },
@@ -35,10 +35,29 @@ const CreateEventForm: React.FC = () => {
   const isOnline = watch('online');
   const startTime = watch('start');
   const isPrivate = watch('isPrivate');
-  const onSubmit: SubmitHandler<Inputs> = (data) => alert(JSON.stringify(data));
+  const mutation = useMutation(
+    ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
+      createEvent(title, location, online, description, category, start, end, isPrivate),
+    {
+      onSuccess: (data) => alert(data.message),
+      onError: (err: FetchError) => {
+        if (err.res.status === 401) {
+          setErrMsg('You are not authorized to make an event');
+        } else {
+          setErrMsg('Something went wrong! Please try again');
+        }
+      },
+    }
+  );
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    mutation.reset();
+    mutation.mutate(data);
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      {mutation.isError && <Alert text={errMsg} />}
+
       <Input
         type="text"
         id="title"
