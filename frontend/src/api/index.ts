@@ -1,3 +1,5 @@
+import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
+
 const API_PATH = '/api';
 
 interface DefaultResponse {
@@ -13,6 +15,11 @@ export class FetchError extends Error {
     super(message);
   }
 }
+
+const getAuthToken = (): string => {
+  const token = localStorage.getItem(LOGIN_TOKEN_NAME);
+  return token ? token : '';
+};
 
 export async function getPong(): Promise<DefaultResponse> {
   return fetch(`${API_PATH}/pong`, {
@@ -77,6 +84,7 @@ export async function createEvent(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: getAuthToken(),
     },
     body: JSON.stringify({
       title: title,
@@ -84,8 +92,8 @@ export async function createEvent(
       online: online,
       description: description,
       category: category,
-      start: start.toUTCString(),
-      end: end.toUTCString(),
+      start: start.toISOString(),
+      end: end.toISOString(),
       visibility: isPrivate ? 'private' : 'public',
     }),
   });

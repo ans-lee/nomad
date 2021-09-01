@@ -39,7 +39,6 @@ const CreateEventForm: React.FC = () => {
     ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
       createEvent(title, location, online, description, category, start, end, isPrivate),
     {
-      onSuccess: (data) => alert(data.message),
       onError: (err: FetchError) => {
         if (err.res.status === 401) {
           setErrMsg('You are not authorized to make an event');

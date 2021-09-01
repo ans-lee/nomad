@@ -49,22 +49,8 @@ func CreateEvent(c *gin.Context) {
 		Category:    data.Category,
 		Start:       primitive.NewDateTimeFromTime(start.UTC()),
 		End:         primitive.NewDateTimeFromTime(end.UTC()),
-		Repeat:      data.Repeat,
 		Visibility:  data.Visibility,
 		CreatedBy:   userID.(primitive.ObjectID),
-	}
-
-	if data.Reminder != "" {
-		reminder, errStr := getReminderTime(data.Reminder, start)
-		if errStr != "" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": errStr,
-			})
-
-			return
-		}
-
-		newEvent.Reminder = primitive.NewDateTimeFromTime(reminder.UTC())
 	}
 
 	if data.GroupID != "" {
@@ -169,7 +155,6 @@ func EditEvent(c *gin.Context) {
 		{Key: "category", Value: data.Category},
 		{Key: "start", Value: primitive.NewDateTimeFromTime(start.UTC())},
 		{Key: "end", Value: primitive.NewDateTimeFromTime(end.UTC())},
-		{Key: "repeat", Value: data.Repeat},
 		{Key: "visibility", Value: data.Visibility},
 	}
 	removeFields := bson.D{}
@@ -184,24 +169,6 @@ func EditEvent(c *gin.Context) {
 		removeFields = append(removeFields, bson.E{Key: "description", Value: ""})
 	} else {
 		updateFields = append(updateFields, bson.E{Key: "description", Value: data.Description})
-	}
-
-	if data.Reminder != "" {
-		reminder, errStr := getReminderTime(data.Reminder, start)
-		if errStr != "" {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": errStr,
-			})
-
-			return
-		}
-
-		updateFields = append(
-			updateFields,
-			bson.E{Key: "reminder", Value: primitive.NewDateTimeFromTime(reminder.UTC())},
-		)
-	} else {
-		removeFields = append(removeFields, bson.E{Key: "reminder", Value: ""})
 	}
 
 	_, _ = db.GetCollection(EventModel.CollectionName).
@@ -236,7 +203,6 @@ func GetEvent(c *gin.Context) {
 		return
 	}
 
-	// TODO account for friends later
 	if event.Visibility == EventConstants.VisibilityPrivate {
 		userID, exists := c.Get(AuthConstants.ContextAuthKey)
 
@@ -262,8 +228,6 @@ func GetEvent(c *gin.Context) {
 		"category":    event.Category,
 		"start":       event.Start.Time().UTC(),
 		"end":         event.End.Time().UTC(),
-		"reminder":    event.Reminder.Time().UTC(),
-		"repeat":      event.Repeat,
 		"visibility":  event.Visibility,
 		"groupID":     groupIDStr,
 	})
@@ -328,30 +292,6 @@ func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr str
 	)
 
 	return start, end, ""
-}
-
-func getReminderTime(reminderStr string, startTime time.Time) (reminder time.Time, errStr string) {
-	reminder, err := time.Parse(time.RFC3339, reminderStr)
-	if err != nil {
-		return reminder, "Reminder time must be in RFC3339 format."
-	}
-
-	if reminder.After(startTime) || reminder.Equal(startTime) {
-		return reminder, "Reminder time cannot be the same or after the start time."
-	}
-
-	reminder = time.Date(
-		reminder.Year(),
-		reminder.Month(),
-		reminder.Day(),
-		reminder.Hour(),
-		reminder.Minute(),
-		0,
-		0,
-		reminder.Location(),
-	)
-
-	return reminder, ""
 }
 
 func getGroupID(idStr string) (primitive.ObjectID, error) {

@@ -13,8 +13,6 @@ type Event struct {
 	Category    string             `bson:"category"`
 	Start       primitive.DateTime `bson:"start"`
 	End         primitive.DateTime `bson:"end"`
-	Reminder    primitive.DateTime `bson:"reminder,omitempty"`
-	Repeat      string             `bson:"repeat"`
 	Visibility  string             `bson:"visibility"`
 	GroupID     primitive.ObjectID `bson:"groupID,omitempty"`
 	CreatedBy   primitive.ObjectID `bson:"createdBy"`
