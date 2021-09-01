@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const links = [
   {
     name: 'Find Event',
-    link: '/',
+    link: '/event/search',
   },
   {
     name: 'Create Event',
@@ -57,28 +57,23 @@ const Header: React.FC = () => {
   };
 
   const Links: React.FC = () => {
-    const linkClasses: string = classNames(
-      'h-full',
-      'items-center',
-      'flex',
-      'flex-col',
-      { hidden: !isOpen },
-      'lg:flex',
-      'lg:flex-row'
-    );
+    const linkClasses: string = classNames('h-full', 'flex', 'flex-col', { hidden: !isOpen }, 'lg:flex', 'lg:flex-row');
+    const hrClasses: string = classNames('mt-2', 'mb-4', { hidden: !isOpen });
 
     return (
       <>
+        <hr className={hrClasses} />
         <div className={linkClasses}>
           {links.map((item, key) => (
-            <Link className="flex px-4 py-2.5 h-full items-center" to={item.link} key={key}>
+            <Link className="flex py-2.5 h-full lg:px-4" to={item.link} key={key}>
               {item.name}
             </Link>
           ))}
         </div>
+        <hr className={hrClasses} />
         <div className={linkClasses}>
           {authLinks.map((item, key) => (
-            <Link className="flex px-4 py-2.5 h-full items-center" to={item.link} key={key}>
+            <Link className="flex py-2.5 h-full lg:px-4" to={item.link} key={key}>
               {item.name}
             </Link>
           ))}
@@ -88,8 +83,8 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header>
-      <nav className="flex flex-col px-3.5 py-1.5 text-lg justify-between w-full shadow lg:flex-row">
+    <header className="sticky top-0 z-50 min-h-14 bg-white shadow">
+      <nav className="flex flex-col px-3.5 py-1.5 text-lg justify-center min-h-14 w-full lg:flex-row lg:justify-between">
         <LogoContainer />
         <Links />
       </nav>

@@ -9,7 +9,14 @@ module.exports = {
   },
   darkMode: false,
   theme: {
-    extend: {},
+    minHeight: {
+      '14': '4rem',
+    },
+    extend: {
+      height: {
+        'screen-nav': 'calc(100vh - 4rem)',
+      },
+    },
   },
   variants: {
     extend: {

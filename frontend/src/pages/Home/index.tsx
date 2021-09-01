@@ -9,7 +9,7 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="flex h-screen text-7xl justify-center items-center">Explore, Experience and Enjoy.</div>
+      <div className="flex h-screen-nav text-7xl justify-center items-center">Explore, Experience and Enjoy.</div>
       <div>{!isLoading ? data?.message : ''}</div>
     </>
   );
