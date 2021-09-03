@@ -2,12 +2,29 @@ import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
 
 const API_PATH = '/api';
 
-interface DefaultResponse {
+export interface DefaultResponse {
   message: string;
 }
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string;
+}
+
+export interface EventData {
+  id: string;
+  title: string;
+  location: string;
+  online: boolean;
+  description: string;
+  category: string;
+  start: string;
+  end: string;
+  visibility: string;
+  groupID: string;
+}
+
+export interface EventsListResponse {
+  events: EventData[];
 }
 
 export class FetchError extends Error {
@@ -96,6 +113,17 @@ export async function createEvent(
       end: end.toISOString(),
       visibility: isPrivate ? 'private' : 'public',
     }),
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
+export async function getAllEvents(): Promise<EventsListResponse> {
+  const response = await fetch(`${API_PATH}/event/all`, {
+    method: 'GET',
   });
 
   if (!response.ok) {

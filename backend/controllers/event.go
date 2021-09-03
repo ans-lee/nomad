@@ -263,8 +263,16 @@ func GetAllEvents(c *gin.Context) {
 			Title: result["title"].(string),
 			Online: result["online"].(bool),
 			Category: result["category"].(string),
-			Start: result["start"].(primitive.DateTime).Time().UTC().String(),
-			End: result["end"].(primitive.DateTime).Time().UTC().String(),
+			Start: result["start"].
+				(primitive.DateTime).
+				Time().
+				UTC().
+				Format(time.RFC3339),
+			End: result["end"].
+				(primitive.DateTime).
+				Time().
+				UTC().
+				Format(time.RFC3339),
 			Visibility: result["visibility"].(string),
 		}
 
