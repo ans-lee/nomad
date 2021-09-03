@@ -233,6 +233,119 @@ func GetEvent(c *gin.Context) {
 	})
 }
 
+func GetAllEvents(c *gin.Context) {
+	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
+
+	cursor, err := db.GetCollection(EventModel.CollectionName).
+		Find(context.Background(), filter)
+	// TODO check whether no events returns error or not
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	var results []bson.M
+	if err = cursor.All(context.Background(), &results); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
+
+		return
+	}
+
+	var events []serializers.GetEventSchema
+	for _, result := range results {
+		event := serializers.GetEventSchema{
+			ID: result["_id"].(primitive.ObjectID).Hex(),
+			Title: result["title"].(string),
+			Online: result["online"].(bool),
+			Category: result["category"].(string),
+			Start: result["start"].(primitive.DateTime).Time().UTC().String(),
+			End: result["end"].(primitive.DateTime).Time().UTC().String(),
+			Visibility: result["visibility"].(string),
+		}
+
+		if val, exist := result["location"]; exist {
+			event.Location = val.(string)
+		}
+
+		if val, exist := result["description"]; exist {
+			event.Description = val.(string)
+		}
+
+		if val, exist := result["groupID"]; exist {
+			event.GroupID = val.(primitive.ObjectID).Hex()
+		}
+
+		events = append(events, event)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+	})
+}
+
+func GetEventCoords(c *gin.Context) {
+	filter := bson.M{
+		"visibility": EventConstants.VisibilityPublic,
+		"location": bson.M{"$exists": true},
+	}
+
+	cursor, err := db.GetCollection(EventModel.CollectionName).
+		Find(context.Background(), filter)
+	// TODO check whether no events returns error or not
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	var results []bson.M
+	if err = cursor.All(context.Background(), &results); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
+
+		return
+	}
+
+	var events []serializers.EventCoordsSchema
+	for _, result := range results {
+		req := &maps.GeocodingRequest{
+			Address: result["location"].(string),
+		}
+
+		coords, err := gmap.GetClient().Geocode(context.Background(), req)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": ResponseConstants.InternalServerErrorMessage,
+			})
+		}
+
+		event := serializers.EventCoordsSchema{
+			ID: result["_id"].(primitive.ObjectID).Hex(),
+			Title: result["title"].(string),
+			Category: result["category"].(string),
+		}
+
+		if (len(coords) > 0) {
+			event.Lat = coords[0].Geometry.Location.Lat
+			event.Lng = coords[0].Geometry.Location.Lng
+		}
+
+		events = append(events, event)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+	})
+}
+
 func GetLocationSuggestions(c *gin.Context) {
 	req := &maps.PlaceAutocompleteRequest{
 		Input: c.Query("input"),

@@ -1,4 +1,6 @@
 import React, { Fragment } from 'react';
+import { useQuery } from 'react-query';
+import { getPong } from 'src/api';
 
 const events = [
   {
@@ -45,6 +47,15 @@ const getEvents = events.map((item, key) => (
   </Fragment>
 ));
 
-const EventsList: React.FC = () => <div className="flex flex-col">{getEvents}</div>;
+const EventsList: React.FC = () => {
+  const { isLoading, data } = useQuery('pong', getPong);
+
+  return (
+    <div className="flex flex-col">
+      {getEvents}
+      <div>{!isLoading ? data?.message : ''}</div>
+    </div>
+  );
+};
 
 export default EventsList;

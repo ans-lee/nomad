@@ -22,3 +22,24 @@ type EditEventSchema struct {
 	End         string `json:"end" binding:"required"`
 	Visibility  string `json:"visibility" binding:"required" validate:"regexp=^(public|private|friends)$"` // nolint:lll
 }
+
+type GetEventSchema struct {
+	ID 			string `json:"id"`
+	Title       string `json:"title"`
+	Location    string `json:"location"`
+	Online      bool   `json:"online"`
+	Description string `json:"description"`
+	Category    string `json:"category"`
+	Start       string `json:"start"`
+	End         string `json:"end"`
+	Visibility  string `json:"visibility"`
+	GroupID     string `json:"groupID"`
+}
+
+type EventCoordsSchema struct {
+	ID 			string  `json:"id"`
+	Title       string  `json:"title"`
+	Category    string  `json:"category"`
+	Lat         float64 `json:"lat"`
+	Lng         float64 `json:"lng"`
+}

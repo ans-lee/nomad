@@ -21,5 +21,7 @@ func SetEventRoutes(router *gin.RouterGroup) {
 		controllers.EditEvent,
 	)
 	eventGroup.GET("/:id", middleware.CheckSessionToken, controllers.GetEvent)
+	eventGroup.GET("/all", middleware.CheckSessionToken, controllers.GetAllEvents)
+	eventGroup.GET("/locations", middleware.CheckSessionToken, controllers.GetEventCoords)
 	eventGroup.GET("/suggestions", middleware.CheckSessionToken, controllers.GetLocationSuggestions)
 }
