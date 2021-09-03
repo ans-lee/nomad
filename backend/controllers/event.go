@@ -278,6 +278,21 @@ func GetAllEvents(c *gin.Context) {
 
 		if val, exist := result["location"]; exist {
 			event.Location = val.(string)
+			req := &maps.GeocodingRequest{
+				Address: result["location"].(string),
+			}
+
+			coords, err := gmap.GetClient().Geocode(context.Background(), req)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": ResponseConstants.InternalServerErrorMessage,
+				})
+			}
+
+			if (len(coords) > 0) {
+				event.Lat = coords[0].Geometry.Location.Lat
+				event.Lng = coords[0].Geometry.Location.Lng
+			}
 		}
 
 		if val, exist := result["description"]; exist {

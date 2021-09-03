@@ -1,6 +1,4 @@
-import React, { Fragment, useState } from 'react';
-import { useQuery } from 'react-query';
-import { getAllEvents, EventsListResponse } from 'src/api';
+import React, { Fragment } from 'react';
 
 type EventDetails = {
   id: string;
@@ -11,6 +9,11 @@ type EventDetails = {
   category: string;
   start: Date;
   end: Date;
+};
+
+type EventsListProps = {
+  loading: boolean;
+  events: EventDetails[];
 };
 
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -82,33 +85,8 @@ const getEvents = (events: EventDetails[]) =>
     </Fragment>
   ));
 
-const EventsList: React.FC = () => {
-  const [events, setEvents] = useState<Array<EventDetails>>([]);
-  const { isLoading } = useQuery('allEvents', getAllEvents, {
-    onSuccess: (data: EventsListResponse) => parseEventListData(data),
-  });
-
-  const parseEventListData = (data: EventsListResponse) => {
-    const newEvents: EventDetails[] = [];
-
-    data.events.forEach((item) => {
-      const newEvent = {
-        id: item.id,
-        title: item.title,
-        location: item.location,
-        online: item.online,
-        description: item.description,
-        category: item.category,
-        start: new Date(item.start),
-        end: new Date(item.end),
-      };
-      newEvents.push(newEvent);
-    });
-
-    setEvents(newEvents);
-  };
-
-  return <div className="flex flex-col">{!isLoading && getEvents(events)}</div>;
+const EventsList: React.FC<EventsListProps> = ({ loading, events }) => {
+  return <div className="flex flex-col">{!loading && getEvents(events)}</div>;
 };
 
 export default EventsList;

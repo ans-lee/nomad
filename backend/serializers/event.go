@@ -27,6 +27,8 @@ type GetEventSchema struct {
 	ID 			string `json:"id"`
 	Title       string `json:"title"`
 	Location    string `json:"location"`
+	Lat         float64 `json:"lat"`
+	Lng         float64 `json:"lng"`
 	Online      bool   `json:"online"`
 	Description string `json:"description"`
 	Category    string `json:"category"`

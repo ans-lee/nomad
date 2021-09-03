@@ -14,6 +14,8 @@ export interface EventData {
   id: string;
   title: string;
   location: string;
+  lat: number;
+  lng: number;
   online: boolean;
   description: string;
   category: string;
