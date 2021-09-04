@@ -2,7 +2,10 @@ package controllers
 
 import (
 	"context"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
@@ -235,6 +238,54 @@ func GetEvent(c *gin.Context) {
 
 func GetAllEvents(c *gin.Context) {
 	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
+	/*
+	category := c.Param("category")
+	*/
+	var neLat float64
+	var neLng float64
+	var swLat float64
+	var swLng float64
+	var err error
+
+	if ne, exist := c.GetQuery("ne"); exist {
+		neLat, err = strconv.ParseFloat(strings.Split(ne, ",")[0], 64)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": ResponseConstants.InternalServerErrorMessage,
+			})
+
+			return
+		}
+
+		neLng, err = strconv.ParseFloat(strings.Split(ne, ",")[1], 64)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": ResponseConstants.InternalServerErrorMessage,
+			})
+
+			return
+		}
+	}
+
+	if sw, exist := c.GetQuery("sw"); exist {
+		swLat, err = strconv.ParseFloat(strings.Split(sw, ",")[0], 64)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": ResponseConstants.InternalServerErrorMessage,
+			})
+
+			return
+		}
+
+		swLng, err = strconv.ParseFloat(strings.Split(sw, ",")[1], 64)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": ResponseConstants.InternalServerErrorMessage,
+			})
+
+			return
+		}
+	}
 
 	cursor, err := db.GetCollection(EventModel.CollectionName).
 		Find(context.Background(), filter)
@@ -276,6 +327,13 @@ func GetAllEvents(c *gin.Context) {
 			Visibility: result["visibility"].(string),
 		}
 
+		/*
+		// Check if category matches
+		if category != result["category"] {
+			continue
+		}
+		*/
+
 		if val, exist := result["location"]; exist {
 			event.Location = val.(string)
 			req := &maps.GeocodingRequest{
@@ -292,6 +350,13 @@ func GetAllEvents(c *gin.Context) {
 			if (len(coords) > 0) {
 				event.Lat = coords[0].Geometry.Location.Lat
 				event.Lng = coords[0].Geometry.Location.Lng
+
+				if !withinBounds(swLng, swLat, neLng, neLat, event.Lng, event.Lat) {
+					log.Println(event.Title)
+					continue
+				}
+			} else {
+				continue
 			}
 		}
 
@@ -475,4 +540,10 @@ func userCanAccessEvent(userID, groupID primitive.ObjectID) bool {
 	}
 
 	return true
+}
+
+func withinBounds(x1, y1, x2, y2, pointX, pointY float64) bool {
+	withinX := pointX > x1 && pointX < x2
+	withinY := pointY > y1 && pointY < y2
+	return withinX && withinY
 }

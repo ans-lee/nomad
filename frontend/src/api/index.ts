@@ -1,3 +1,4 @@
+import { Coords } from 'google-map-react';
 import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
 
 const API_PATH = '/api';
@@ -123,8 +124,8 @@ export async function createEvent(
   return response.json();
 }
 
-export async function getAllEvents(): Promise<EventsListResponse> {
-  const response = await fetch(`${API_PATH}/event/all`, {
+export async function getAllEvents(ne: Coords, sw: Coords): Promise<EventsListResponse> {
+  const response = await fetch(`${API_PATH}/event/all?ne=${ne.lat},${ne.lng}&sw=${sw.lat},${sw.lng}`, {
     method: 'GET',
   });
 

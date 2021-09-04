@@ -1,16 +1,19 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
-import { Coords } from 'google-map-react';
+import { Bounds, Coords } from 'google-map-react';
 import { getAllEvents, EventsListResponse } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
 import { DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
 import { EventDetails } from 'src/types/EventTypes';
 
+const baseCoords = { lat: 0, lng: 0 };
+
 const EventsContainer: React.FC = () => {
   const [events, setEvents] = useState<Array<EventDetails>>([]);
   const [center, setCenter] = useState<Coords>(DEFAULT_CENTER);
-  const { isLoading } = useQuery('allEvents', getAllEvents, {
+  const [bounds, setBounds] = useState<Bounds>({ ne: baseCoords, nw: baseCoords, se: baseCoords, sw: baseCoords });
+  const { isLoading } = useQuery('allEvents', () => getAllEvents(bounds.ne, bounds.se), {
     onSuccess: (data: EventsListResponse) => parseEventListData(data),
   });
 
@@ -42,7 +45,7 @@ const EventsContainer: React.FC = () => {
         <h1 className="text-4xl mb-4">Events</h1>
         <EventsList loading={isLoading} events={events} />
       </div>
-      <GoogleMap loading={isLoading} events={events} center={center} />
+      <GoogleMap loading={isLoading} events={events} center={center} bounds={bounds} setBounds={setBounds} />
     </>
   );
 };
