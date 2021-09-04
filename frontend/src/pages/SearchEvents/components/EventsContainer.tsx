@@ -1,24 +1,15 @@
 import React, { Fragment, useState } from 'react';
 import { useQuery } from 'react-query';
+import { Coords } from 'google-map-react';
 import { getAllEvents, EventsListResponse } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
-
-export type EventDetails = {
-  id: string;
-  title: string;
-  location: string;
-  lat: number;
-  lng: number;
-  online: boolean;
-  description: string;
-  category: string;
-  start: Date;
-  end: Date;
-};
+import { DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
+import { EventDetails } from 'src/types/EventTypes';
 
 const EventsContainer: React.FC = () => {
   const [events, setEvents] = useState<Array<EventDetails>>([]);
+  const [center, setCenter] = useState<Coords>(DEFAULT_CENTER);
   const { isLoading } = useQuery('allEvents', getAllEvents, {
     onSuccess: (data: EventsListResponse) => parseEventListData(data),
   });
@@ -51,7 +42,7 @@ const EventsContainer: React.FC = () => {
         <h1 className="text-4xl mb-4">Events</h1>
         <EventsList loading={isLoading} events={events} />
       </div>
-      <GoogleMap loading={isLoading} events={events} />
+      <GoogleMap loading={isLoading} events={events} center={center} />
     </>
   );
 };

@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
+import { useQuery } from 'react-query';
 import GoogleMapReact, { ChangeEventValue, Coords } from 'google-map-react';
+import { getAllEvents } from 'src/api';
 import MapMarker from 'src/components/MapMarker';
-import { MAP_STLYES, DEFAULT_CENTER, DEFAULT_ZOOM } from 'src/constants/GoogleMapConstants';
+import { MAP_STLYES, DEFAULT_ZOOM } from 'src/constants/GoogleMapConstants';
 import { EventDetails, EventsListProps } from 'src/types/EventTypes';
+
+interface GoogleMapProps extends EventsListProps {
+  center: Coords;
+}
 
 const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
 
-const GoogleMap: React.FC<EventsListProps> = ({ loading, events }) => {
-  const [center, setCenter] = useState<Coords>(DEFAULT_CENTER);
+const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, center }) => {
+  const { refetch } = useQuery('allEvents', getAllEvents);
   const apiKey: string = process.env.GOOGLE_API_KEY ? process.env.GOOGLE_API_KEY : '';
 
   return (
@@ -20,8 +26,10 @@ const GoogleMap: React.FC<EventsListProps> = ({ loading, events }) => {
         bootstrapURLKeys={{ key: apiKey }}
         center={center}
         defaultZoom={DEFAULT_ZOOM}
-        yesIWantToUseGoogleMapApiInternals={true}
-        onChange={(value: ChangeEventValue) => console.log(value.center)}
+        onChange={(value: ChangeEventValue) => {
+          console.log(value.bounds);
+          refetch();
+        }}
       >
         {!loading && getLocations(events)}
       </GoogleMapReact>
