@@ -1,22 +1,6 @@
 import React, { Fragment } from 'react';
-
-type EventDetails = {
-  id: string;
-  title: string;
-  location: string;
-  online: boolean;
-  description: string;
-  category: string;
-  start: Date;
-  end: Date;
-};
-
-type EventsListProps = {
-  loading: boolean;
-  events: EventDetails[];
-};
-
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Wed', 'Thu', 'Fri', 'Sat'];
+import { DAYS } from 'src/constants/EventConstants';
+import { EventDetails, EventsListProps } from 'src/types/EventTypes';
 
 const getDuration = (start: Date, end: Date): string => {
   const timeNow = new Date();
@@ -34,7 +18,7 @@ const getDuration = (start: Date, end: Date): string => {
       minute: 'numeric',
     });
 
-    return `${days[start.getDay()]} ${startStr} - ${days[end.getDay()]} ${endStr}`;
+    return `${DAYS[start.getDay()]} ${startStr} - ${DAYS[end.getDay()]} ${endStr}`;
   }
 
   const startStr = start.toLocaleString(undefined, {
@@ -52,7 +36,7 @@ const getDuration = (start: Date, end: Date): string => {
     minute: 'numeric',
   });
 
-  return `${days[start.getDay()]} ${startStr} - ${days[end.getDay()]} ${endStr}`;
+  return `${DAYS[start.getDay()]} ${startStr} - ${DAYS[end.getDay()]} ${endStr}`;
 };
 
 const getLocationComponent = (location: string) =>
