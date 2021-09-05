@@ -30,6 +30,7 @@ const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, c
         render={({ field: { onChange } }) => (
           <ReactSelect
             className="mt-2 mb-4"
+            placeholder="Enter a location..."
             onChange={onChange}
             isLoading={isLoading}
             onInputChange={(value) => {

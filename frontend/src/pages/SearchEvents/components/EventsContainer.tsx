@@ -7,29 +7,29 @@ import GoogleMap from 'src/components/GoogleMap';
 import { DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
 import { EventDetails } from 'src/types/EventTypes';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Input from 'src/components/Form/Input';
+import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 
 type Inputs = {
-  location: string;
+  location: { value: string; label: string };
 };
 
 const baseCoords = { lat: 0, lng: 0 };
 
 const EventsContainer: React.FC = () => {
-  const { handleSubmit, watch, register } = useForm<Inputs>();
-  const location = watch('location');
+  const { handleSubmit, watch, control } = useForm<Inputs>({ defaultValues: { location: { value: '', label: '' } } });
+  const watchLocation = watch('location');
   const [events, setEvents] = useState<Array<EventDetails>>([]);
   const [center, setCenter] = useState<Coords>(DEFAULT_CENTER);
   const [bounds, setBounds] = useState<Bounds>({ ne: baseCoords, nw: baseCoords, se: baseCoords, sw: baseCoords });
   const { isLoading } = useQuery('allEvents', () => getAllEvents(bounds.ne, bounds.se), {
     onSuccess: (data: EventsListResponse) => parseEventListData(data),
   });
-  const searchQuery = useQuery('location', () => getLocation(location), {
+  const searchQuery = useQuery('location', () => getLocation(watchLocation.value), {
     onSuccess: (data: Coords) => setCenter(data),
     enabled: false,
   });
   const onSubmit: SubmitHandler<Inputs> = () => {
-    //TODO use useQuery onSuccess
+    console.log('hi');
     searchQuery.refetch();
   };
 
@@ -55,23 +55,13 @@ const EventsContainer: React.FC = () => {
     setEvents(newEvents);
   };
 
-  const SearchForm = () => (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Input
-        type="text"
-        id="location"
-        label="Location"
-        placeholder="Enter a location..."
-        register={register}
-      />
-    </form>
-  );
-
   return (
     <>
       <div className="h-full w-2/5 p-6 overflow-scroll">
         <h1 className="text-4xl mb-4">Events</h1>
-        <SearchForm />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <LocationAutocomplete id="location" label="Location" control={control} />
+        </form>
         <EventsList loading={isLoading} events={events} />
       </div>
       <GoogleMap
