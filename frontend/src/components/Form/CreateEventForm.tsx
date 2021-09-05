@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import ReactSelect from 'react-select';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
 import { OPTIONS } from 'src/constants/EventConstants';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
-import { useMutation, useQuery } from 'react-query';
-import { createEvent, FetchError, getLocation, getLocationSuggestions } from 'src/api';
+import { useMutation } from 'react-query';
+import { createEvent, FetchError } from 'src/api';
 import Alert from 'src/components/Alert';
+import LocationAutocomplete from './LocationAutocomplete';
 
 type Inputs = {
   title: string;
@@ -24,23 +24,16 @@ type Inputs = {
 
 const CreateEventForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
-  const [locationInput, setLocationInput] = useState('');
   const {
     register,
     formState: { errors },
     handleSubmit,
     control,
     watch,
-  } = useForm<Inputs>({ defaultValues: { online: true } });
+  } = useForm<Inputs>({ defaultValues: { online: true, location: { value: '', label: '' } } });
   const isOnline = watch('online');
   const startTime = watch('start');
   const isPrivate = watch('isPrivate');
-  const { isLoading, data, refetch } = useQuery(['suggest', locationInput], ({ queryKey }) => {
-    if (queryKey[1]) {
-      return getLocationSuggestions(queryKey[1]);
-    }
-    return { locations: [] };
-  });
   const mutation = useMutation(
     ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
       createEvent(title, location.value, online, description, category, start, end, isPrivate),
@@ -59,8 +52,6 @@ const CreateEventForm: React.FC = () => {
     mutation.mutate(data);
   };
 
-  console.log(data);
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {mutation.isError && <Alert text={errMsg} />}
@@ -76,20 +67,7 @@ const CreateEventForm: React.FC = () => {
       {errors.title && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
       {errors.title?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">Title is too long</div>}
 
-      <Controller
-        name="location"
-        control={control}
-        render={({ field: { onChange } }) => (
-          <ReactSelect
-            onChange={onChange}
-            isLoading={isLoading}
-            onInputChange={(value) => {
-              setLocationInput(value);
-            }}
-            options={data?.locations.map((item) => ({ value: item, label: item }))}
-          />
-        )}
-      />
+      <LocationAutocomplete id="location" label="Location" control={control} />
 
       <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
 
