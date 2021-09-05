@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from 'react-query';
 import GoogleMapReact from 'google-map-react';
 import { getAllEvents } from 'src/api';
@@ -11,8 +11,6 @@ const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
 
 const GoogleMap: React.FC = () => {
-  const [mounted, setMounted] = useState(false);
-
   const events = useStore((state) => state.events);
   const filters = useStore((state) => state.eventFilters);
   const bounds = useStore((state) => state.mapBounds);
@@ -34,12 +32,8 @@ const GoogleMap: React.FC = () => {
         center={center}
         defaultZoom={DEFAULT_ZOOM}
         onChange={({ bounds, center }) => {
-          if (mounted) {
-            setBounds(bounds);
-            setCenter(center);
-          } else {
-            setMounted(true);
-          }
+          setBounds(bounds);
+          setCenter(center);
           refetch();
         }}
         onGoogleApiLoaded={() => setCenter(center)}
