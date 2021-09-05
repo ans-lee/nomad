@@ -11,6 +11,10 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface EventsListResponse {
+  events: EventData[];
+}
+
 export interface EventData {
   id: string;
   title: string;
@@ -24,10 +28,6 @@ export interface EventData {
   end: string;
   visibility: string;
   groupID: string;
-}
-
-export interface EventsListResponse {
-  events: EventData[];
 }
 
 export class FetchError extends Error {
@@ -126,6 +126,28 @@ export async function createEvent(
 
 export async function getAllEvents(ne: Coords, sw: Coords): Promise<EventsListResponse> {
   const response = await fetch(`${API_PATH}/event/all?ne=${ne.lat},${ne.lng}&sw=${sw.lat},${sw.lng}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
+export async function getLocation(input: string): Promise<Coords> {
+  const response = await fetch(`${API_PATH}/event/location?input=${input}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
+export async function getLocationSuggestions(input: string): Promise<{ locations: string[] }> {
+  const response = await fetch(`${API_PATH}/event/suggestions?input=${input}`, {
     method: 'GET',
   });
 

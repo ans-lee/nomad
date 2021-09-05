@@ -376,25 +376,9 @@ func GetAllEvents(c *gin.Context) {
 	})
 }
 
-func GetEventCoords(c *gin.Context) {
-	filter := bson.M{
-		"visibility": EventConstants.VisibilityPublic,
-		"location": bson.M{"$exists": true},
-	}
-
-	cursor, err := db.GetCollection(EventModel.CollectionName).
-		Find(context.Background(), filter)
-	// TODO check whether no events returns error or not
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": ResponseConstants.InvalidEventIDMessage,
-		})
-
-		return
-	}
-
-	var results []bson.M
-	if err = cursor.All(context.Background(), &results); err != nil {
+func GetLocationCoords(c *gin.Context) {
+	input, exist := c.GetQuery("input")
+	if !exist {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": ResponseConstants.InternalServerErrorMessage,
 		})
@@ -402,35 +386,22 @@ func GetEventCoords(c *gin.Context) {
 		return
 	}
 
-	var events []serializers.EventCoordsSchema
-	for _, result := range results {
-		req := &maps.GeocodingRequest{
-			Address: result["location"].(string),
-		}
+	req := &maps.GeocodingRequest{
+		Address: input,
+	}
 
-		coords, err := gmap.GetClient().Geocode(context.Background(), req)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": ResponseConstants.InternalServerErrorMessage,
-			})
-		}
+	coords, err := gmap.GetClient().Geocode(context.Background(), req)
+	if err != nil || len(coords) < 1 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
 
-		event := serializers.EventCoordsSchema{
-			ID: result["_id"].(primitive.ObjectID).Hex(),
-			Title: result["title"].(string),
-			Category: result["category"].(string),
-		}
-
-		if (len(coords) > 0) {
-			event.Lat = coords[0].Geometry.Location.Lat
-			event.Lng = coords[0].Geometry.Location.Lng
-		}
-
-		events = append(events, event)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"events": events,
+		"lat": coords[0].Geometry.Location.Lat,
+		"lng": coords[0].Geometry.Location.Lng,
 	})
 }
 

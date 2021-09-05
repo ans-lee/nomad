@@ -10,12 +10,13 @@ interface GoogleMapProps extends EventsListProps {
   center: Coords;
   bounds: Bounds;
   setBounds: Dispatch<SetStateAction<Bounds>>;
+  setCenter: Dispatch<SetStateAction<Coords>>;
 }
 
 const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
 
-const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, center, bounds, setBounds }) => {
+const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, center, bounds, setCenter, setBounds }) => {
   const { refetch } = useQuery('allEvents', () => getAllEvents(bounds.ne, bounds.sw));
   const apiKey: string = process.env.GOOGLE_API_KEY ? process.env.GOOGLE_API_KEY : '';
 
@@ -30,6 +31,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, center, bounds, 
         defaultZoom={DEFAULT_ZOOM}
         onChange={(value: ChangeEventValue) => {
           setBounds(value.bounds);
+          setCenter(value.center);
           refetch();
         }}
       >
