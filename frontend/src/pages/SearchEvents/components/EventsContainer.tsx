@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
-import { Bounds, Coords } from 'google-map-react';
+import { Coords } from 'google-map-react';
 import { getAllEvents, EventsListResponse, getLocation } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
-import { DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
 import { EventDetails, EventFilters } from 'src/types/EventTypes';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import Input from 'src/components/Form/Input';
 import Select from 'src/components/Form/Select';
 import { OPTIONS } from 'src/constants/EventConstants';
+import { useStore } from 'src/store';
 
 type Inputs = {
   location: { value: string; label: string };
@@ -18,17 +18,18 @@ type Inputs = {
   category: string;
 };
 
-const baseCoords = { lat: 0, lng: 0 };
-
 const EventsContainer: React.FC = () => {
   const { handleSubmit, watch, register, control } = useForm<Inputs>({
     defaultValues: { location: { value: '', label: '' } },
   });
   const watchLocation = watch('location');
+
   const [filters, setFilters] = useState<EventFilters>({ title: '', category: 'none' });
   const [events, setEvents] = useState<Array<EventDetails>>([]);
-  const [center, setCenter] = useState<Coords>(DEFAULT_CENTER);
-  const [bounds, setBounds] = useState<Bounds>({ ne: baseCoords, nw: baseCoords, se: baseCoords, sw: baseCoords });
+
+  const bounds = useStore((state) => state.mapBounds);
+  const setCenter = useStore((state) => state.setMapCenter);
+
   const { isLoading } = useQuery(
     'allEvents',
     () => getAllEvents(bounds.ne, bounds.se, filters.title, filters.category),
@@ -91,15 +92,7 @@ const EventsContainer: React.FC = () => {
         </form>
         <EventsList loading={isLoading} events={events} />
       </div>
-      <GoogleMap
-        loading={isLoading}
-        filters={filters}
-        events={events}
-        center={center}
-        bounds={bounds}
-        setCenter={setCenter}
-        setBounds={setBounds}
-      />
+      <GoogleMap loading={isLoading} filters={filters} events={events} />
     </>
   );
 };

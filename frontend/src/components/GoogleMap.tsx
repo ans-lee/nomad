@@ -1,23 +1,25 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
-import GoogleMapReact, { Bounds, ChangeEventValue, Coords } from 'google-map-react';
+import GoogleMapReact from 'google-map-react';
 import { getAllEvents } from 'src/api';
 import MapMarker from 'src/components/MapMarker';
 import { MAP_STLYES, DEFAULT_ZOOM } from 'src/constants/GoogleMapConstants';
 import { EventDetails, EventFilters, EventsListProps } from 'src/types/EventTypes';
+import { useStore } from 'src/store';
 
 interface GoogleMapProps extends EventsListProps {
   filters: EventFilters;
-  center: Coords;
-  bounds: Bounds;
-  setBounds: Dispatch<SetStateAction<Bounds>>;
-  setCenter: Dispatch<SetStateAction<Coords>>;
 }
 
 const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
 
-const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, filters, center, bounds, setCenter, setBounds }) => {
+const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, filters }) => {
+  const [mounted, setMounted] = useState(false);
+  const bounds = useStore((state) => state.mapBounds);
+  const center = useStore((state) => state.mapCenter);
+  const setBounds = useStore((state) => state.setMapBounds);
+  const setCenter = useStore((state) => state.setMapCenter);
   const { refetch } = useQuery('allEvents', () => getAllEvents(bounds.ne, bounds.sw, filters.title, filters.category));
 
   return (
@@ -29,11 +31,16 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, filters, center,
         bootstrapURLKeys={{ key: `${process.env.GOOGLE_API_KEY}` }}
         center={center}
         defaultZoom={DEFAULT_ZOOM}
-        onChange={(value: ChangeEventValue) => {
-          setBounds(value.bounds);
-          setCenter(value.center);
+        onChange={({ bounds, center }) => {
+          if (mounted) {
+            setBounds(bounds);
+            setCenter(center);
+          } else {
+            setMounted(true);
+          }
           refetch();
         }}
+        onGoogleApiLoaded={() => setCenter(center)}
       >
         {!loading && getLocations(events)}
       </GoogleMapReact>
