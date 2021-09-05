@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Coords } from 'google-map-react';
 import { getAllEvents, EventsListResponse, getLocation } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
-import { EventFilters } from 'src/types/EventTypes';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import Input from 'src/components/Form/Input';
 import Select from 'src/components/Form/Select';
-import { OPTIONS } from 'src/constants/EventConstants';
+import { DEFAULT_FILTERS, OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
 import { parseEventListResponse } from 'src/utils/EventUtils';
+import { DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
 
 type Inputs = {
   location: { value: string; label: string };
@@ -26,9 +26,15 @@ const EventsContainer: React.FC = () => {
   const watchLocation = watch('location');
 
   const bounds = useStore((state) => state.mapBounds);
+  const filters = useStore((state) => state.eventFilters);
   const setEvents = useStore((state) => state.setEvents);
   const setCenter = useStore((state) => state.setMapCenter);
-  const [filters, setFilters] = useState<EventFilters>({ title: '', category: 'none' });
+  const setFilters = useStore((state) => state.setEventFilters);
+
+  useEffect(() => {
+    setCenter(DEFAULT_CENTER);
+    setFilters(DEFAULT_FILTERS);
+  }, [setCenter, setFilters]);
 
   const eventsQuery = useQuery(
     ['allEvents', bounds, filters],
@@ -43,13 +49,12 @@ const EventsContainer: React.FC = () => {
   });
 
   const locationSubmit: SubmitHandler<Inputs> = (data) => {
-    if (data.location.value) {
+    const { location, title, category } = data;
+    if (location.value) {
       searchQuery.refetch();
     }
-    setFilters({
-      title: data.title,
-      category: data.category,
-    });
+
+    setFilters({ title: title, category: category });
   };
 
   return (
@@ -71,7 +76,7 @@ const EventsContainer: React.FC = () => {
         </form>
         <EventsList loading={eventsQuery.isLoading} />
       </div>
-      <GoogleMap filters={filters} />
+      <GoogleMap />
     </>
   );
 };

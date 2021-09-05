@@ -36,5 +36,5 @@ export const OPTIONS = [
     value: 'other',
   },
 ];
-
 export const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const DEFAULT_FILTERS = { title: '', category: 'none' };
