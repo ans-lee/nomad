@@ -1,43 +1,7 @@
 import React, { Fragment } from 'react';
-import { DAYS } from 'src/constants/EventConstants';
+import { useStore } from 'src/store';
 import { EventDetails, EventsListProps } from 'src/types/EventTypes';
-
-const getDuration = (start: Date, end: Date): string => {
-  const timeNow = new Date();
-  if (start.getFullYear() === timeNow.getFullYear() && start.getFullYear() === end.getFullYear()) {
-    const startStr = start.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    });
-    const endStr = end.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    });
-
-    return `${DAYS[start.getDay()]} ${startStr} - ${DAYS[end.getDay()]} ${endStr}`;
-  }
-
-  const startStr = start.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-  const endStr = end.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-
-  return `${DAYS[start.getDay()]} ${startStr} - ${DAYS[end.getDay()]} ${endStr}`;
-};
+import { getDuration } from 'src/utils/EventUtils';
 
 const getLocationComponent = (location: string) =>
   location ? (
@@ -69,7 +33,9 @@ const getEvents = (events: EventDetails[]) =>
     </Fragment>
   ));
 
-const EventsList: React.FC<EventsListProps> = ({ loading, events }) => {
+const EventsList: React.FC<EventsListProps> = ({ loading }) => {
+  const events = useStore((state) => state.events);
+
   return <div className="flex flex-col">{!loading && getEvents(events)}</div>;
 };
 

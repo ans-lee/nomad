@@ -18,5 +18,4 @@ export type EventFilters = {
 
 export type EventsListProps = {
   loading: boolean;
-  events: EventDetails[];
 };

@@ -14,13 +14,18 @@ interface GoogleMapProps extends EventsListProps {
 const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
 
-const GoogleMap: React.FC<GoogleMapProps> = ({ loading, events, filters }) => {
+const GoogleMap: React.FC<GoogleMapProps> = ({ loading, filters }) => {
   const [mounted, setMounted] = useState(false);
+
+  const events = useStore((state) => state.events);
   const bounds = useStore((state) => state.mapBounds);
   const center = useStore((state) => state.mapCenter);
   const setBounds = useStore((state) => state.setMapBounds);
   const setCenter = useStore((state) => state.setMapCenter);
-  const { refetch } = useQuery('allEvents', () => getAllEvents(bounds.ne, bounds.sw, filters.title, filters.category));
+
+  const { refetch } = useQuery(['allEvents', bounds, filters], () =>
+    getAllEvents(bounds.ne, bounds.sw, filters.title, filters.category)
+  );
 
   return (
     <div className="h-full w-3/5">

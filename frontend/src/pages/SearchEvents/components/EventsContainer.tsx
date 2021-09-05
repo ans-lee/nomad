@@ -4,13 +4,14 @@ import { Coords } from 'google-map-react';
 import { getAllEvents, EventsListResponse, getLocation } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
-import { EventDetails, EventFilters } from 'src/types/EventTypes';
+import { EventFilters } from 'src/types/EventTypes';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import Input from 'src/components/Form/Input';
 import Select from 'src/components/Form/Select';
 import { OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
+import { parseEventListResponse } from 'src/utils/EventUtils';
 
 type Inputs = {
   location: { value: string; label: string };
@@ -24,23 +25,23 @@ const EventsContainer: React.FC = () => {
   });
   const watchLocation = watch('location');
 
-  const [filters, setFilters] = useState<EventFilters>({ title: '', category: 'none' });
-  const [events, setEvents] = useState<Array<EventDetails>>([]);
-
   const bounds = useStore((state) => state.mapBounds);
+  const setEvents = useStore((state) => state.setEvents);
   const setCenter = useStore((state) => state.setMapCenter);
+  const [filters, setFilters] = useState<EventFilters>({ title: '', category: 'none' });
 
   const { isLoading } = useQuery(
-    'allEvents',
+    ['allEvents', bounds, filters],
     () => getAllEvents(bounds.ne, bounds.se, filters.title, filters.category),
     {
-      onSuccess: (data: EventsListResponse) => parseEventListData(data),
+      onSuccess: (data: EventsListResponse) => setEvents(parseEventListResponse(data)),
     }
   );
   const searchQuery = useQuery('location', () => getLocation(watchLocation.value), {
     onSuccess: (data: Coords) => setCenter(data),
     enabled: false,
   });
+
   const locationSubmit: SubmitHandler<Inputs> = (data) => {
     if (data.location.value) {
       searchQuery.refetch();
@@ -49,28 +50,6 @@ const EventsContainer: React.FC = () => {
       title: data.title,
       category: data.category,
     });
-  };
-
-  const parseEventListData = (data: EventsListResponse) => {
-    const newEvents: EventDetails[] = [];
-
-    data.events.forEach((item) => {
-      const newEvent = {
-        id: item.id,
-        title: item.title,
-        location: item.location,
-        lat: item.lat,
-        lng: item.lng,
-        online: item.online,
-        description: item.description,
-        category: item.category,
-        start: new Date(item.start),
-        end: new Date(item.end),
-      };
-      newEvents.push(newEvent);
-    });
-
-    setEvents(newEvents);
   };
 
   return (
@@ -90,9 +69,9 @@ const EventsContainer: React.FC = () => {
             Search
           </button>
         </form>
-        <EventsList loading={isLoading} events={events} />
+        <EventsList loading={isLoading} />
       </div>
-      <GoogleMap loading={isLoading} filters={filters} events={events} />
+      <GoogleMap loading={isLoading} filters={filters} />
     </>
   );
 };
