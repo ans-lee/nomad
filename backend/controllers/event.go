@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -310,7 +309,7 @@ func GetAllEvents(c *gin.Context) {
 		return
 	}
 
-	var events []serializers.GetEventSchema
+	events := make([]serializers.GetEventSchema, 0)
 	for _, result := range results {
 		event := serializers.GetEventSchema{
 			ID: result["_id"].(primitive.ObjectID).Hex(),
@@ -355,7 +354,6 @@ func GetAllEvents(c *gin.Context) {
 				event.Lng = coords[0].Geometry.Location.Lng
 
 				if !withinBounds(swLng, swLat, neLng, neLat, event.Lng, event.Lat) {
-					log.Println(event.Title)
 					continue
 				}
 			} else {

@@ -124,7 +124,12 @@ export async function createEvent(
   return response.json();
 }
 
-export async function getAllEvents(ne: Coords, sw: Coords, title: string, category: string): Promise<EventsListResponse> {
+export async function getAllEvents(
+  ne: Coords,
+  sw: Coords,
+  title: string,
+  category: string
+): Promise<EventsListResponse> {
   const url = `${API_PATH}/event/all?ne=${ne.lat},${ne.lng}&sw=${sw.lat},${sw.lng}&title=${title}&category=${category}`;
   const response = await fetch(url, {
     method: 'GET',

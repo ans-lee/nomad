@@ -14,7 +14,6 @@ export type EventDetails = {
 export type EventFilters = {
   title: string;
   category: string;
-  start: Date;
 };
 
 export type EventsListProps = {
