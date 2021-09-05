@@ -30,7 +30,7 @@ const EventsContainer: React.FC = () => {
   const setCenter = useStore((state) => state.setMapCenter);
   const [filters, setFilters] = useState<EventFilters>({ title: '', category: 'none' });
 
-  const { isLoading } = useQuery(
+  const eventsQuery = useQuery(
     ['allEvents', bounds, filters],
     () => getAllEvents(bounds.ne, bounds.se, filters.title, filters.category),
     {
@@ -69,9 +69,9 @@ const EventsContainer: React.FC = () => {
             Search
           </button>
         </form>
-        <EventsList loading={isLoading} />
+        <EventsList loading={eventsQuery.isLoading} />
       </div>
-      <GoogleMap loading={isLoading} filters={filters} />
+      <GoogleMap filters={filters} />
     </>
   );
 };

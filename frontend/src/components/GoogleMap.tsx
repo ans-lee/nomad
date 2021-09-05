@@ -4,17 +4,17 @@ import GoogleMapReact from 'google-map-react';
 import { getAllEvents } from 'src/api';
 import MapMarker from 'src/components/MapMarker';
 import { MAP_STLYES, DEFAULT_ZOOM } from 'src/constants/GoogleMapConstants';
-import { EventDetails, EventFilters, EventsListProps } from 'src/types/EventTypes';
+import { EventDetails, EventFilters } from 'src/types/EventTypes';
 import { useStore } from 'src/store';
 
-interface GoogleMapProps extends EventsListProps {
+interface GoogleMapProps {
   filters: EventFilters;
 }
 
 const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
 
-const GoogleMap: React.FC<GoogleMapProps> = ({ loading, filters }) => {
+const GoogleMap: React.FC<GoogleMapProps> = ({ filters }) => {
   const [mounted, setMounted] = useState(false);
 
   const events = useStore((state) => state.events);
@@ -47,7 +47,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ loading, filters }) => {
         }}
         onGoogleApiLoaded={() => setCenter(center)}
       >
-        {!loading && getLocations(events)}
+        {getLocations(events)}
       </GoogleMapReact>
     </div>
   );
