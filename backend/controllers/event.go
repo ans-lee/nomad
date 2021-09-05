@@ -287,6 +287,9 @@ func GetAllEvents(c *gin.Context) {
 		}
 	}
 
+	category := c.Query("category")
+	title := c.Query("title")
+
 	cursor, err := db.GetCollection(EventModel.CollectionName).
 		Find(context.Background(), filter)
 	// TODO check whether no events returns error or not
@@ -327,12 +330,12 @@ func GetAllEvents(c *gin.Context) {
 			Visibility: result["visibility"].(string),
 		}
 
-		/*
 		// Check if category matches
-		if category != result["category"] {
+		if category != "" && category != EventConstants.CategoryNone && category != event.Category {
+			continue
+		} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
 			continue
 		}
-		*/
 
 		if val, exist := result["location"]; exist {
 			event.Location = val.(string)

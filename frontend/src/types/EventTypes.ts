@@ -11,6 +11,12 @@ export type EventDetails = {
   end: Date;
 };
 
+export type EventFilters = {
+  title: string;
+  category: string;
+  start: Date;
+};
+
 export type EventsListProps = {
   loading: boolean;
   events: EventDetails[];
