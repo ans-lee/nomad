@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from 'react-query';
 import { getUserMyself } from 'src/api';
+import EditUserDetailsForm from 'src/components/Form/EditUserDetailsForm';
 import { useStore } from 'src/store';
 import { UserDetails } from 'src/types/UserTypes';
 
@@ -21,8 +22,7 @@ const ProfileContainer: React.FC = () => {
         {!isLoading && (
           <>
             <div className="text-4xl mb-2">{`Welcome, ${firstName}`}</div>
-            <div className="text-3xl mb-2">{`${firstName} ${lastName}`}</div>
-            <div className="text-xl mb-2">{email}</div>
+            <EditUserDetailsForm />
           </>
         )}
       </div>

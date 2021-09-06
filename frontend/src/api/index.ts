@@ -162,3 +162,23 @@ export async function getUserMyself(): Promise<UserDetails> {
   }
   return response.json();
 }
+
+export async function updateUserDetails(email: string, firstName: string, lastName: string): Promise<UserDetails> {
+  const response = await fetch(`${API_PATH}/user/me`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: getAuthToken(),
+    },
+    body: JSON.stringify({
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
