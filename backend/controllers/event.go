@@ -518,6 +518,11 @@ func userCanAccessEvent(userID, groupID primitive.ObjectID) bool {
 }
 
 func withinBounds(x1, y1, x2, y2, pointX, pointY float64) bool {
+	// If all bounds are 0
+	if (x1 + y1 + x2 + y2 == 0) {
+		return true
+	}
+
 	withinX := pointX > x1 && pointX < x2
 	withinY := pointY > y1 && pointY < y2
 	return withinX && withinY

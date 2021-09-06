@@ -18,7 +18,7 @@ type Inputs = {
   hideNoLocation: boolean;
 };
 
-const FiltersForm: React.FC = () => {
+const FiltersForm: React.FC<{ hideLocation?: boolean }> = ({ hideLocation }) => {
   const filters = useStore((state) => state.eventFilters);
   const setFilters = useStore((state) => state.setEventFilters);
   const setCenter = useStore((state) => state.setMapCenter);
@@ -57,7 +57,7 @@ const FiltersForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <LocationAutocomplete id="location" label="Location" control={control} />
+      {!hideLocation && <LocationAutocomplete id="location" label="Location" control={control} />}
       <Input type="text" id="title" label="Title" register={register} />
       <Select id="category" label="Category" register={register} options={OPTIONS} />
       <ToggleSwitch id="hideOnline" label="Hide online events" enabled={watchHideOnline} register={register} />
