@@ -103,9 +103,20 @@ export async function getAllEvents(
   ne: Coords,
   sw: Coords,
   title: string,
-  category: string
+  category: string,
+  hideOnline: boolean,
+  hideNoLocation: boolean
 ): Promise<{ events: EventData[] }> {
-  const url = `${API_PATH}/event/all?ne=${ne.lat},${ne.lng}&sw=${sw.lat},${sw.lng}&title=${title}&category=${category}`;
+  let url = `${API_PATH}/event/all?ne=${ne.lat},${ne.lng}&sw=${sw.lat},${sw.lng}&title=${title}&category=${category}`;
+
+  if (hideOnline) {
+    url = `${url}&showOnline=true`;
+  }
+
+  if (hideNoLocation) {
+    url = `${url}&hasLocation=true`;
+  }
+
   const response = await fetch(url, {
     method: 'GET',
   });

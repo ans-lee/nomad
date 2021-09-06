@@ -237,9 +237,6 @@ func GetEvent(c *gin.Context) {
 
 func GetAllEvents(c *gin.Context) {
 	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
-	/*
-	category := c.Param("category")
-	*/
 	var neLat float64
 	var neLng float64
 	var swLat float64
@@ -288,6 +285,8 @@ func GetAllEvents(c *gin.Context) {
 
 	category := c.Query("category")
 	title := c.Query("title")
+	hideOnline := c.Query("hideOnline")
+	hasLocation := c.Query("hasLocation")
 
 	cursor, err := db.GetCollection(EventModel.CollectionName).
 		Find(context.Background(), filter)
@@ -329,13 +328,6 @@ func GetAllEvents(c *gin.Context) {
 			Visibility: result["visibility"].(string),
 		}
 
-		// Check if category matches
-		if category != "" && category != EventConstants.CategoryNone && category != event.Category {
-			continue
-		} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
-			continue
-		}
-
 		if val, exist := result["location"]; exist {
 			event.Location = val.(string)
 			req := &maps.GeocodingRequest{
@@ -359,6 +351,17 @@ func GetAllEvents(c *gin.Context) {
 			} else {
 				continue
 			}
+		}
+
+		// Filtering
+		if hideOnline == "true" && event.Online {
+			continue
+		} else if hasLocation == "true" && event.Location == "" {
+			continue
+		} else if category != "" && category != EventConstants.CategoryNone && category != event.Category {
+			continue
+		} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
+			continue
 		}
 
 		if val, exist := result["description"]; exist {

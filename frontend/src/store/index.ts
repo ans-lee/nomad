@@ -20,7 +20,7 @@ interface AppState {
 export const useStore = create<AppState>((set) => ({
   userDetails: { email: '', firstName: '', lastName: '' },
   events: [],
-  eventFilters: { title: '', category: 'none' },
+  eventFilters: { title: '', category: 'none', hideOnline: true, hideNoLocation: true },
   mapCenter: DEFAULT_CENTER,
   mapBounds: DEFAULT_BOUNDS,
   setUserDetails: (newDetails: UserDetails) => set(() => ({ userDetails: newDetails })),

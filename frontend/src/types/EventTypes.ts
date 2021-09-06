@@ -29,4 +29,6 @@ export interface EventDetails {
 export interface EventFilters {
   title: string;
   category: string;
+  hideOnline: boolean;
+  hideNoLocation: boolean;
 };

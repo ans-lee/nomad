@@ -16,7 +16,8 @@ const EventsContainer: React.FC = () => {
 
   const eventsQuery = useQuery(
     ['allEvents', bounds, filters],
-    () => getAllEvents(bounds.ne, bounds.se, filters.title, filters.category),
+    () =>
+      getAllEvents(bounds.ne, bounds.se, filters.title, filters.category, filters.hideOnline, filters.hideNoLocation),
     {
       onSuccess: (data) => setEvents(parseEventDataList(data)),
     }

@@ -16,6 +16,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ id, label, enabled, registe
     'mt-2',
     'mb-4',
     'rounded-2xl',
+    'relative',
     enabled ? 'bg-green-400' : 'bg-gray-600',
     'transition-colors',
     'duration-200'

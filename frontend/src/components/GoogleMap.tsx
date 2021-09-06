@@ -19,7 +19,7 @@ const GoogleMap: React.FC = () => {
   const setCenter = useStore((state) => state.setMapCenter);
 
   const { isLoading, refetch } = useQuery(['allEvents', bounds, filters], () =>
-    getAllEvents(bounds.ne, bounds.sw, filters.title, filters.category)
+    getAllEvents(bounds.ne, bounds.sw, filters.title, filters.category, filters.hideOnline, filters.hideNoLocation)
   );
 
   return (
