@@ -1,34 +1,8 @@
 import { Coords } from 'google-map-react';
 import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
+import { EventData } from 'src/types/EventTypes';
 
 const API_PATH = '/api';
-
-export interface DefaultResponse {
-  message: string;
-}
-
-export interface LoginResponse {
-  token: string;
-}
-
-export interface EventsListResponse {
-  events: EventData[];
-}
-
-export interface EventData {
-  id: string;
-  title: string;
-  location: string;
-  lat: number;
-  lng: number;
-  online: boolean;
-  description: string;
-  category: string;
-  start: string;
-  end: string;
-  visibility: string;
-  groupID: string;
-}
 
 export class FetchError extends Error {
   constructor(public res: Response, message?: string) {
@@ -41,7 +15,7 @@ const getAuthToken = (): string => {
   return token ? token : '';
 };
 
-export async function getPong(): Promise<DefaultResponse> {
+export async function getPong(): Promise<{ message: string }> {
   return fetch(`${API_PATH}/pong`, {
     method: 'GET',
   }).then((res) => res.json());
@@ -52,7 +26,7 @@ export async function userSignUp(
   password: string,
   firstName: string,
   lastName: string
-): Promise<DefaultResponse> {
+): Promise<{ message: string }> {
   const response = await fetch(`${API_PATH}/auth/signup`, {
     method: 'POST',
     headers: {
@@ -72,7 +46,7 @@ export async function userSignUp(
   return response.json();
 }
 
-export async function userLogin(email: string, password: string): Promise<LoginResponse> {
+export async function userLogin(email: string, password: string): Promise<{ token: string }> {
   const response = await fetch(`${API_PATH}/auth/login`, {
     method: 'POST',
     headers: {
@@ -99,7 +73,7 @@ export async function createEvent(
   start: Date,
   end: Date,
   isPrivate: boolean
-): Promise<DefaultResponse> {
+): Promise<{ message: string }> {
   const response = await fetch(`${API_PATH}/event/create`, {
     method: 'POST',
     headers: {
@@ -129,7 +103,7 @@ export async function getAllEvents(
   sw: Coords,
   title: string,
   category: string
-): Promise<EventsListResponse> {
+): Promise<{ events: EventData[] }> {
   const url = `${API_PATH}/event/all?ne=${ne.lat},${ne.lng}&sw=${sw.lat},${sw.lng}&title=${title}&category=${category}`;
   const response = await fetch(url, {
     method: 'GET',
@@ -154,6 +128,17 @@ export async function getLocation(input: string): Promise<Coords> {
 
 export async function getLocationSuggestions(input: string): Promise<{ locations: string[] }> {
   const response = await fetch(`${API_PATH}/event/suggestions?input=${input}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
+export async function getEvent(id: string): Promise<EventData> {
+  const response = await fetch(`${API_PATH}/event/${id}`, {
     method: 'GET',
   });
 

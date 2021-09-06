@@ -1,4 +1,19 @@
-export type EventDetails = {
+export interface EventData {
+  id: string;
+  title: string;
+  location: string;
+  lat: number;
+  lng: number;
+  online: boolean;
+  description: string;
+  category: string;
+  start: string;
+  end: string;
+  visibility: string;
+  groupID: string;
+}
+
+export interface EventDetails {
   id: string;
   title: string;
   location: string;
@@ -11,11 +26,11 @@ export type EventDetails = {
   end: Date;
 };
 
-export type EventFilters = {
+export interface EventFilters {
   title: string;
   category: string;
 };
 
-export type EventsListProps = {
+export interface EventsListProps {
   loading: boolean;
 };

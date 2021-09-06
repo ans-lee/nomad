@@ -8,7 +8,7 @@ type CreateEventSchema struct {
 	Category    string `json:"category" binding:"required" validate:"category"`
 	Start       string `json:"start" binding:"required"`
 	End         string `json:"end" binding:"required"`
-	Visibility  string `json:"visibility" binding:"required" validate:"regexp=^(public|private|friends)$"` // nolint:lll
+	Visibility  string `json:"visibility" binding:"required" validate:"regexp=^(public|private)$"` // nolint:lll
 	GroupID     string `json:"groupID" validate:"min=0,max=24"`
 }
 

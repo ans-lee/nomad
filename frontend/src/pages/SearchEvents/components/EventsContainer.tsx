@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Coords } from 'google-map-react';
-import { getAllEvents, EventsListResponse, getLocation } from 'src/api';
+import { getAllEvents, getLocation } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -10,8 +10,7 @@ import Input from 'src/components/Form/Input';
 import Select from 'src/components/Form/Select';
 import { DEFAULT_FILTERS, OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
-import { parseEventListResponse } from 'src/utils/EventUtils';
-import { DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
+import { parseEventDataList } from 'src/utils/EventUtils';
 
 type Inputs = {
   location: { value: string; label: string };
@@ -32,18 +31,17 @@ const EventsContainer: React.FC = () => {
   const setFilters = useStore((state) => state.setEventFilters);
 
   useEffect(() => {
-    setCenter(DEFAULT_CENTER);
     setFilters(DEFAULT_FILTERS);
-  }, [setCenter, setFilters]);
+  }, [setFilters]);
 
   const eventsQuery = useQuery(
     ['allEvents', bounds, filters],
     () => getAllEvents(bounds.ne, bounds.se, filters.title, filters.category),
     {
-      onSuccess: (data: EventsListResponse) => setEvents(parseEventListResponse(data)),
+      onSuccess: (data) => setEvents(parseEventDataList(data)),
     }
   );
-  const searchQuery = useQuery('location', () => getLocation(watchLocation.value), {
+  const locationQuery = useQuery('location', () => getLocation(watchLocation.value), {
     onSuccess: (data: Coords) => setCenter(data),
     enabled: false,
   });
@@ -51,7 +49,7 @@ const EventsContainer: React.FC = () => {
   const locationSubmit: SubmitHandler<Inputs> = (data) => {
     const { location, title, category } = data;
     if (location.value) {
-      searchQuery.refetch();
+      locationQuery.refetch();
     }
 
     setFilters({ title: title, category: category });

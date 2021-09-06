@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import CreateEventPage from './pages/CreateEvent';
+import EventPage from './pages/Event';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import SearchEventsPage from './pages/SearchEvents';
@@ -26,6 +27,10 @@ const routes = [
   {
     route: '/event/search',
     component: SearchEventsPage,
+  },
+  {
+    route: '/event/:id',
+    component: EventPage,
   },
 ];
 

@@ -1,6 +1,5 @@
-import { EventsListResponse } from 'src/api';
 import { DAYS } from 'src/constants/EventConstants';
-import { EventDetails } from 'src/types/EventTypes';
+import { EventData, EventDetails } from 'src/types/EventTypes';
 
 const localeDateStringOptions: Intl.DateTimeFormatOptions = {
   month: 'short',
@@ -9,25 +8,26 @@ const localeDateStringOptions: Intl.DateTimeFormatOptions = {
   minute: 'numeric',
 };
 
-export const parseEventListResponse = (data: EventsListResponse): EventDetails[] => {
+export const parseEventData = (data: EventData): EventDetails => {
+  return {
+    id: data.id,
+    title: data.title,
+    location: data.location,
+    lat: data.lat,
+    lng: data.lng,
+    online: data.online,
+    description: data.description,
+    category: data.category,
+    start: new Date(data.start),
+    end: new Date(data.end),
+  };
+};
+
+export const parseEventDataList = (data: { events: EventData[] }): EventDetails[] => {
   const { events } = data;
   const newEvents: EventDetails[] = [];
 
-  events.forEach((item) => {
-    const newEvent = {
-      id: item.id,
-      title: item.title,
-      location: item.location,
-      lat: item.lat,
-      lng: item.lng,
-      online: item.online,
-      description: item.description,
-      category: item.category,
-      start: new Date(item.start),
-      end: new Date(item.end),
-    };
-    newEvents.push(newEvent);
-  });
+  events.forEach((item) => newEvents.push(parseEventData(item)));
 
   return newEvents;
 };
