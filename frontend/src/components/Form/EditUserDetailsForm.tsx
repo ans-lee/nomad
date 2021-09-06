@@ -4,8 +4,8 @@ import Input from 'src/components/Form/Input';
 import { useMutation } from 'react-query';
 import { FetchError, updateUserDetails } from 'src/api';
 import Alert from 'src/components/Alert';
-import {UserDetails} from 'src/types/UserTypes';
-import {useStore} from 'src/store';
+import { UserDetails } from 'src/types/UserTypes';
+import { useStore } from 'src/store';
 
 type Inputs = {
   email: string;
@@ -23,8 +23,7 @@ const EditUserDetailsForm: React.FC = () => {
     handleSubmit,
   } = useForm<Inputs>({ defaultValues: { email: email, firstName: firstName, lastName: lastName } });
   const mutation = useMutation(
-    ({ email, firstName, lastName }: Inputs) =>
-      updateUserDetails(email, firstName, lastName),
+    ({ email, firstName, lastName }: Inputs) => updateUserDetails(email, firstName, lastName),
     {
       onSuccess: (data: UserDetails) => setUserDetails({ ...data }),
       onError: (err: FetchError) => {
@@ -70,7 +69,9 @@ const EditUserDetailsForm: React.FC = () => {
         register={register}
       />
       {errors.firstName && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
-      {errors.firstName?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">First name is too long</div>}
+      {errors.firstName?.type === 'maxLength' && (
+        <div className="text-sm text-red-500 -mt-2 mb-2">First name is too long</div>
+      )}
 
       <Input
         type="text"
@@ -81,7 +82,9 @@ const EditUserDetailsForm: React.FC = () => {
         register={register}
       />
       {errors.lastName && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
-      {errors.lastName?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">Last name is too long</div>}
+      {errors.lastName?.type === 'maxLength' && (
+        <div className="text-sm text-red-500 -mt-2 mb-2">Last name is too long</div>
+      )}
 
       <button
         type="submit"

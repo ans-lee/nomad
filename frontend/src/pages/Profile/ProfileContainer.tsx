@@ -6,14 +6,12 @@ import { useStore } from 'src/store';
 import { UserDetails } from 'src/types/UserTypes';
 
 const ProfileContainer: React.FC = () => {
-  const userDetails = useStore((state) => state.userDetails);
+  const { firstName } = useStore((state) => state.userDetails);
   const setUserDetails = useStore((state) => state.setUserDetails);
   const { isLoading } = useQuery('userMyself', getUserMyself, {
     onSuccess: (data: UserDetails) => setUserDetails({ ...data }),
     refetchOnWindowFocus: false,
   });
-
-  const { email, firstName, lastName } = userDetails;
 
   return (
     <div className="flex flex-col w-full h-full px-4 py-8">
