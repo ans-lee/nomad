@@ -1,38 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useQuery } from 'react-query';
-import { Coords } from 'google-map-react';
-import { getAllEvents, getLocation } from 'src/api';
+import { getAllEvents } from 'src/api';
 import EventsList from 'src/components/EventsList';
 import GoogleMap from 'src/components/GoogleMap';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
-import Input from 'src/components/Form/Input';
-import Select from 'src/components/Form/Select';
-import { DEFAULT_FILTERS, OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
 import { parseEventDataList } from 'src/utils/EventUtils';
-
-type Inputs = {
-  location: { value: string; label: string };
-  title: string;
-  category: string;
-};
+import FiltersForm from 'src/components/Form/FiltersForm';
 
 const EventsContainer: React.FC = () => {
-  const { handleSubmit, watch, register, control } = useForm<Inputs>({
-    defaultValues: { location: { value: '', label: '' } },
-  });
-  const watchLocation = watch('location');
-
   const bounds = useStore((state) => state.mapBounds);
   const filters = useStore((state) => state.eventFilters);
   const setEvents = useStore((state) => state.setEvents);
-  const setCenter = useStore((state) => state.setMapCenter);
-  const setFilters = useStore((state) => state.setEventFilters);
-
-  useEffect(() => {
-    setFilters(DEFAULT_FILTERS);
-  }, [setFilters]);
 
   const eventsQuery = useQuery(
     ['allEvents', bounds, filters],
@@ -41,19 +19,6 @@ const EventsContainer: React.FC = () => {
       onSuccess: (data) => setEvents(parseEventDataList(data)),
     }
   );
-  const locationQuery = useQuery('location', () => getLocation(watchLocation.value), {
-    onSuccess: (data: Coords) => setCenter(data),
-    enabled: false,
-  });
-
-  const locationSubmit: SubmitHandler<Inputs> = (data) => {
-    const { location, title, category } = data;
-    if (location.value) {
-      locationQuery.refetch();
-    }
-
-    setFilters({ title: title, category: category });
-  };
 
   return (
     <>
@@ -61,17 +26,7 @@ const EventsContainer: React.FC = () => {
         <h1 className="text-4xl mb-4">Events</h1>
         <hr className="my-2" />
         <div className="text-xl mb-4">Filters</div>
-        <form onSubmit={handleSubmit(locationSubmit)}>
-          <LocationAutocomplete id="location" label="Location" control={control} />
-          <Input type="text" id="title" label="Title" register={register} />
-          <Select id="category" label="Category" register={register} options={OPTIONS} />
-          <button
-            type="submit"
-            className="w-full bg-green-500 rounded-md border border-green-600 text-white px-3.5 py-2 mt-4 disabled:opacity-50"
-          >
-            Search
-          </button>
-        </form>
+        <FiltersForm />
         <EventsList loading={eventsQuery.isLoading} />
       </div>
       <GoogleMap />
