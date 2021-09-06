@@ -44,11 +44,16 @@ const EventInfo: React.FC = () => {
   return (
     <div className="flex flex-col w-full h-full px-4 py-8">
       <div className="mx-72">
-        <div className="rounded-md border border-gray-300 w-full h-96 mb-4"></div>
-        <div className="text-3xl mb-2">{details.title}</div>
-        <div className="text-xl mb-2">{getDuration(details.start, details.end)}</div>
-        {getLocationComponent(details.location)}
-        {getDescriptionComponent(details.description)}
+        {isLoading && <div>Loading</div>}
+        {!isLoading && (
+          <>
+            <div className="rounded-md border border-gray-300 w-full h-96 mb-4"></div>
+            <div className="text-3xl mb-2">{details.title}</div>
+            <div className="text-xl mb-2">{getDuration(details.start, details.end)}</div>
+            {getLocationComponent(details.location)}
+            {getDescriptionComponent(details.description)}
+          </>
+        )}
       </div>
     </div>
   );
