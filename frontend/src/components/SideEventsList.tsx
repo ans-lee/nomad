@@ -17,7 +17,7 @@ const getDescriptionComponent = (description: string) =>
     <div className="truncate italic text-gray-500">No description specified</div>
   );
 
-const EventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
+const SideEventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
   const events = useStore((state) => state.events);
 
   return (
@@ -43,4 +43,4 @@ const EventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
   );
 };
 
-export default EventsList;
+export default SideEventsList;

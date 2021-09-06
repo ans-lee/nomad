@@ -23,24 +23,22 @@ const GoogleMap: React.FC = () => {
   );
 
   return (
-    <div className="h-full w-3/5">
-      <GoogleMapReact
-        options={{
-          styles: MAP_STLYES,
-        }}
-        bootstrapURLKeys={{ key: `${process.env.GOOGLE_API_KEY}` }}
-        center={center}
-        defaultZoom={DEFAULT_ZOOM}
-        onChange={({ bounds, center }) => {
-          setBounds(bounds);
-          setCenter(center);
-          refetch();
-        }}
-        onGoogleApiLoaded={() => setCenter(center)}
-      >
-        {!isLoading && getLocations(events)}
-      </GoogleMapReact>
-    </div>
+    <GoogleMapReact
+      options={{
+        styles: MAP_STLYES,
+      }}
+      bootstrapURLKeys={{ key: `${process.env.GOOGLE_API_KEY}` }}
+      center={center}
+      defaultZoom={DEFAULT_ZOOM}
+      onChange={({ bounds, center }) => {
+        setBounds(bounds);
+        setCenter(center);
+        refetch();
+      }}
+      onGoogleApiLoaded={() => setCenter(center)}
+    >
+      {!isLoading && getLocations(events)}
+    </GoogleMapReact>
   );
 };
 

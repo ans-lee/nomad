@@ -30,7 +30,3 @@ export interface EventFilters {
   title: string;
   category: string;
 };
-
-export interface EventsListProps {
-  loading: boolean;
-};
