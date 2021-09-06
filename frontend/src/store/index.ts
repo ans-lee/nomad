@@ -2,12 +2,15 @@ import { Bounds, Coords } from 'google-map-react';
 import create from 'zustand';
 import { DEFAULT_BOUNDS, DEFAULT_CENTER } from 'src/constants/GoogleMapConstants';
 import { EventDetails, EventFilters } from 'src/types/EventTypes';
+import { UserDetails } from 'src/types/UserTypes';
 
 interface AppState {
+  userDetails: UserDetails;
   events: EventDetails[];
   eventFilters: EventFilters;
   mapCenter: Coords;
   mapBounds: Bounds;
+  setUserDetails: (newDetails: UserDetails) => void;
   setEvents: (newEvents: EventDetails[]) => void;
   setEventFilters: (newFilters: EventFilters) => void;
   setMapCenter: (newCenter: Coords) => void;
@@ -15,10 +18,12 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set) => ({
+  userDetails: { email: '', firstName: '', lastName: '' },
   events: [],
   eventFilters: { title: '', category: 'none' },
   mapCenter: DEFAULT_CENTER,
   mapBounds: DEFAULT_BOUNDS,
+  setUserDetails: (newDetails: UserDetails) => set(() => ({ userDetails: newDetails })),
   setEvents: (newEvents: EventDetails[]) => set(() => ({ events: newEvents })),
   setEventFilters: (newFilters: EventFilters) => set(() => ({ eventFilters: newFilters })),
   setMapCenter: (newCenter: Coords) => set(() => ({ mapCenter: newCenter })),

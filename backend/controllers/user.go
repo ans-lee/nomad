@@ -8,9 +8,11 @@ import (
 	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	UserModel "github.com/anslee/nomad/models/user"
+	"github.com/anslee/nomad/serializers"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"gopkg.in/validator.v2"
 )
 
 func GetUser(c *gin.Context) {
@@ -58,5 +60,48 @@ func GetUserMyself(c *gin.Context) {
 		"email":     user.Email,
 		"firstName": user.FirstName,
 		"lastName":  user.LastName,
+	})
+}
+
+func UpdateUserMyself(c *gin.Context) {
+	var data serializers.UpdateUserSchema
+	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidJSONPayloadMessage,
+		})
+
+		return
+	}
+
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	filter := bson.M{"_id": userID}
+
+	result := db.GetCollection(UserModel.CollectionName).
+		FindOne(context.Background(), filter)
+	if result.Err() != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidUserIDMessage,
+		})
+
+		return
+	}
+
+	updateFields := bson.D{
+		{Key: "email", Value: data.Email},
+		{Key: "firstName", Value: data.FirstName},
+		{Key: "lastName", Value: data.LastName},
+	}
+
+	_, _ = db.GetCollection(UserModel.CollectionName).
+		UpdateOne(
+			context.Background(),
+			filter,
+			bson.D{{Key: "$set", Value: updateFields}},
+		)
+
+	c.JSON(http.StatusOK, gin.H{
+		"email": data.Email,
+		"firstName": data.FirstName,
+		"lastName": data.LastName,
 	})
 }

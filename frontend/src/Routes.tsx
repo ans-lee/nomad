@@ -4,6 +4,7 @@ import CreateEventPage from './pages/CreateEvent';
 import EventPage from './pages/Event';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
+import ProfilePage from './pages/Profile';
 import SearchEventsPage from './pages/SearchEvents';
 import SignUpPage from './pages/SignUp';
 
@@ -31,6 +32,10 @@ const routes = [
   {
     route: '/event/:id',
     component: EventPage,
+  },
+  {
+    route: '/profile',
+    component: ProfilePage,
   },
 ];
 

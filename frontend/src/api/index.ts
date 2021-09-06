@@ -1,6 +1,7 @@
 import { Coords } from 'google-map-react';
 import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
 import { EventData } from 'src/types/EventTypes';
+import { UserDetails } from 'src/types/UserTypes';
 
 const API_PATH = '/api';
 
@@ -140,6 +141,20 @@ export async function getLocationSuggestions(input: string): Promise<{ locations
 export async function getEvent(id: string): Promise<EventData> {
   const response = await fetch(`${API_PATH}/event/${id}`, {
     method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
+export async function getUserMyself(): Promise<UserDetails> {
+  const response = await fetch(`${API_PATH}/user/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: getAuthToken(),
+    },
   });
 
   if (!response.ok) {
