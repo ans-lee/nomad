@@ -96,6 +96,7 @@ func CreateEvent(c *gin.Context) {
 	})
 }
 
+//TODO check whether user was the person who created the event
 func EditEvent(c *gin.Context) {
 	var data serializers.EditEventSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
