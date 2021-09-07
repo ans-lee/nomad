@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import CreateEventPage from './pages/CreateEvent';
+import EditEventPage from './pages/EditEvent';
 import EventPage from './pages/Event';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
@@ -34,6 +35,11 @@ const routes = [
     route: '/event/search',
     component: SearchEventsPage,
     authRequired: false,
+  },
+  {
+    route: '/event/edit/:id',
+    component: EditEventPage,
+    authRequired: true,
   },
   {
     route: '/event/:id',

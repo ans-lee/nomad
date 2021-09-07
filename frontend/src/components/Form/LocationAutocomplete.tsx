@@ -7,10 +7,11 @@ import { getLocationSuggestions } from 'src/api';
 interface LocationAutcompleteProps {
   id: string;
   label: string;
+  defaultValue?: { value: string; label: string; };
   control: Control<any>; // eslint-disable-line
 }
 
-const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, control }) => {
+const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, defaultValue, control }) => {
   const [locationInput, setLocationInput] = useState('');
   const { isLoading, data } = useQuery(['suggestions', locationInput], ({ queryKey }) => {
     if (queryKey[1]) {
@@ -31,6 +32,7 @@ const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, c
           <ReactSelect
             className="mt-2 mb-4"
             placeholder="Enter a location..."
+            defaultValue={defaultValue}
             isClearable={true}
             onChange={onChange}
             isLoading={isLoading}
