@@ -20,7 +20,7 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set) => ({
-  userDetails: { email: '', firstName: '', lastName: '' },
+  userDetails: { id: '', email: '', firstName: '', lastName: '' },
   userAuthenticated: false,
   events: [],
   eventFilters: { title: '', category: 'none', hideOnline: true, hideNoLocation: true },

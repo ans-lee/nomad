@@ -37,6 +37,7 @@ const GoogleMap: React.FC = () => {
         refetch();
       }}
       onGoogleApiLoaded={() => setCenter(center)}
+      yesIWantToUseGoogleMapApiInternals={true}
     >
       {!isLoading && getLocations(events)}
     </GoogleMapReact>

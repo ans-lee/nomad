@@ -22,7 +22,7 @@ const ProtectedRoute = ({ exact, path, component: Component }: ProtectedRoutePro
       setUserAuthenticated(true);
     },
     onError: () => {
-      setUserDetails({ email: '', firstName: '', lastName: '' });
+      setUserDetails({ id: '', email: '', firstName: '', lastName: '' });
       setUserAuthenticated(false);
     },
     refetchOnWindowFocus: false,

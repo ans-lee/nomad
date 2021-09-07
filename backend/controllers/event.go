@@ -231,6 +231,7 @@ func GetEvent(c *gin.Context) {
 		"start":       event.Start.Time().UTC(),
 		"end":         event.End.Time().UTC(),
 		"visibility":  event.Visibility,
+		"createdBy":   event.CreatedBy.Hex(),
 		"groupID":     groupIDStr,
 	})
 }
@@ -428,6 +429,111 @@ func GetLocationSuggestions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"locations": result,
+	})
+}
+
+func GetUserCreatedEvents(c *gin.Context) {
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	filter := bson.M{"createdBy": userID}
+
+	cursor, err := db.GetCollection(EventModel.CollectionName).
+		Find(context.Background(), filter)
+	// TODO check whether no events returns error or not
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	var results []bson.M
+	if err = cursor.All(context.Background(), &results); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
+
+		return
+	}
+
+	events := make([]serializers.GetEventSchema, 0)
+	for _, result := range results {
+		event := serializers.GetEventSchema{
+			ID: result["_id"].(primitive.ObjectID).Hex(),
+			Title: result["title"].(string),
+			Online: result["online"].(bool),
+			Category: result["category"].(string),
+			Start: result["start"].
+				(primitive.DateTime).
+				Time().
+				UTC().
+				Format(time.RFC3339),
+			End: result["end"].
+				(primitive.DateTime).
+				Time().
+				UTC().
+				Format(time.RFC3339),
+			Visibility: result["visibility"].(string),
+		}
+
+		if val, exist := result["location"]; exist {
+			event.Location = val.(string)
+		}
+
+		if val, exist := result["description"]; exist {
+			event.Description = val.(string)
+		}
+
+		if val, exist := result["groupID"]; exist {
+			event.GroupID = val.(primitive.ObjectID).Hex()
+		}
+
+		events = append(events, event)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+	})
+}
+
+func DeleteEvent(c *gin.Context) {
+	var event EventModel.Event
+
+	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": eventID}
+
+	err := db.GetCollection(EventModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&event)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	if userID.(primitive.ObjectID) != event.CreatedBy {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not have permission to delete this event.",
+		})
+
+		return
+	}
+
+	result, err := db.GetCollection(EventModel.CollectionName).
+		DeleteOne(context.Background(), filter)
+	if err != nil || result.DeletedCount != 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Event deleted!",
 	})
 }
 

@@ -46,7 +46,7 @@ const Header: React.FC = () => {
       setUserAuthenticated(true);
     },
     onError: () => {
-      setUserDetails({ email: '', firstName: '', lastName: '' });
+      setUserDetails({ id: '', email: '', firstName: '', lastName: '' });
       setUserAuthenticated(false);
     },
     refetchOnWindowFocus: false,
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
             ))}
           {firstName && (
             <Link className="flex py-2.5 h-full lg:px-4" to="/profile">
-              Profile
+              My Profile
             </Link>
           )}
         </div>

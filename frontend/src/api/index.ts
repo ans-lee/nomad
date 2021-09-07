@@ -127,6 +127,20 @@ export async function getAllEvents(
   return response.json();
 }
 
+export async function getUserCreatedEvents(): Promise<{ events: EventData[] }> {
+  const response = await fetch(`${API_PATH}/event/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: getAuthToken(),
+    },
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
 export async function getLocation(input: string): Promise<Coords> {
   const response = await fetch(`${API_PATH}/event/location?input=${input}`, {
     method: 'GET',
@@ -152,6 +166,20 @@ export async function getLocationSuggestions(input: string): Promise<{ locations
 export async function getEvent(id: string): Promise<EventData> {
   const response = await fetch(`${API_PATH}/event/${id}`, {
     method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
+export async function deleteEvent(id: string): Promise<{ message: string }> {
+  const response = await fetch(`${API_PATH}/event/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: getAuthToken(),
+    },
   });
 
   if (!response.ok) {

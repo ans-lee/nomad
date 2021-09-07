@@ -20,6 +20,7 @@ export const parseEventData = (data: EventData): EventDetails => {
     category: data.category,
     start: new Date(data.start),
     end: new Date(data.end),
+    createdBy: data.createdBy,
   };
 };
 

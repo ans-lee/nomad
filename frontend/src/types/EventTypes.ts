@@ -10,6 +10,7 @@ export interface EventData {
   start: string;
   end: string;
   visibility: string;
+  createdBy: string;
   groupID: string;
 }
 
@@ -24,6 +25,7 @@ export interface EventDetails {
   category: string;
   start: Date;
   end: Date;
+  createdBy: string;
 };
 
 export interface EventFilters {

@@ -57,12 +57,14 @@ func GetUserMyself(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
+		"id":        user.ID.Hex(),
 		"email":     user.Email,
 		"firstName": user.FirstName,
 		"lastName":  user.LastName,
 	})
 }
 
+// TODO check that email already exists or not
 func UpdateUserMyself(c *gin.Context) {
 	var data serializers.UpdateUserSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {

@@ -20,6 +20,18 @@ func SetEventRoutes(router *gin.RouterGroup) {
 		middleware.AuthRequired,
 		controllers.EditEvent,
 	)
+	eventGroup.DELETE(
+		"/:id",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.DeleteEvent,
+	)
+	eventGroup.GET(
+		"/me",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.GetUserCreatedEvents,
+	)
 	eventGroup.GET("/:id", middleware.CheckSessionToken, controllers.GetEvent)
 	eventGroup.GET("/all", middleware.CheckSessionToken, controllers.GetAllEvents)
 	eventGroup.GET("/location", middleware.CheckSessionToken, controllers.GetLocationCoords)

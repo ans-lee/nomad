@@ -4,6 +4,7 @@ import { getUserMyself } from 'src/api';
 import EditUserDetailsForm from 'src/components/Form/EditUserDetailsForm';
 import { useStore } from 'src/store';
 import { UserDetails } from 'src/types/UserTypes';
+import CreatedEvents from './CreatedEvents';
 
 const ProfileContainer: React.FC = () => {
   const { firstName } = useStore((state) => state.userDetails);
@@ -16,7 +17,7 @@ const ProfileContainer: React.FC = () => {
       setUserAuthenticated(true);
     },
     onError: () => {
-      setUserDetails({ email: '', firstName: '', lastName: '' });
+      setUserDetails({ id: '', email: '', firstName: '', lastName: '' });
       setUserAuthenticated(false);
     },
     refetchOnWindowFocus: false,
@@ -31,6 +32,7 @@ const ProfileContainer: React.FC = () => {
           <>
             <div className="text-4xl mb-2">{`Welcome, ${firstName}`}</div>
             <EditUserDetailsForm />
+            <CreatedEvents />
           </>
         )}
       </div>
