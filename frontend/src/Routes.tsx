@@ -6,6 +6,7 @@ import EditEventPage from './pages/EditEvent';
 import EventPage from './pages/Event';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
+import LogoutPage from './pages/Logout';
 import ProfilePage from './pages/Profile';
 import SearchEventsPage from './pages/SearchEvents';
 import SignUpPage from './pages/SignUp';
@@ -20,6 +21,11 @@ const routes = [
     route: '/login',
     component: LoginPage,
     authRequired: false,
+  },
+  {
+    route: '/logout',
+    component: LogoutPage,
+    authRequired: true,
   },
   {
     route: '/signup',

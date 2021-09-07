@@ -65,6 +65,20 @@ export async function userLogin(email: string, password: string): Promise<{ toke
   return response.json();
 }
 
+export async function userLogout(): Promise<{ message: string }> {
+  const response = await fetch(`${API_PATH}/auth/logout`, {
+    method: 'POST',
+    headers: {
+      Authorization: getAuthToken(),
+    },
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
 export async function createEvent(
   title: string,
   location: string,

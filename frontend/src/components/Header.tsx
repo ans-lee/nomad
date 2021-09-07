@@ -101,9 +101,14 @@ const Header: React.FC = () => {
               </Link>
             ))}
           {firstName && (
-            <Link className="flex py-2.5 h-full lg:px-4" to="/profile">
-              My Profile
-            </Link>
+            <>
+              <Link className="flex py-2.5 h-full lg:px-4" to="/profile">
+                My Profile
+              </Link>
+              <Link className="flex py-2.5 h-full lg:px-4" to="/logout">
+                Log Out
+              </Link>
+            </>
           )}
         </div>
       </>
