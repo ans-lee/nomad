@@ -1,38 +1,25 @@
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
 import { OPTIONS } from 'src/constants/EventConstants';
-import { editEvent, FetchError } from 'src/api';
+import { editEvent, FetchError, getEvent } from 'src/api';
 import Alert from 'src/components/Alert';
 import LocationAutocomplete from './LocationAutocomplete';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
 import { useParams } from 'react-router-dom';
+import { EventData, EventFormInputs } from 'src/types/EventTypes';
 
 interface PageParams {
   id: string;
 }
 
-type Inputs = {
-  title: string;
-  location: { value: string; label: string };
-  online: boolean;
-  description: string;
-  category: string;
-  start: Date;
-  end: Date;
-  isPrivate: boolean;
-};
-
-interface EditEventFormProps {
-  defaultValues: Inputs;
-}
-
-const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
+const EditEventForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+  const [defaultLocation, setDefaultLocation] = useState({ value: '', label: '' });
   const { id } = useParams<PageParams>();
 
   const {
@@ -41,13 +28,30 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
     handleSubmit,
     control,
     watch,
-  } = useForm<Inputs>({ defaultValues: defaultValues });
+    setValue,
+  } = useForm<EventFormInputs>();
   const isOnline = watch('online');
   const startTime = watch('start');
   const isPrivate = watch('isPrivate');
 
+  const { isLoading } = useQuery(['viewEvent'], () => getEvent(id), {
+    onSuccess: (data: EventData) => {
+      setValue('title', data.title);
+      setValue('location', { value: data.location, label: data.location });
+      setDefaultLocation({ value: data.location, label: data.location });
+      setValue('online', data.online);
+      setValue('description', data.description);
+      setValue('category', data.category);
+      setValue('start', new Date(data.start));
+      setValue('end', new Date(data.end));
+      setValue('isPrivate', data.visibility === 'private');
+    },
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
   const mutation = useMutation(
-    ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
+    ({ title, location, online, description, category, start, end, isPrivate }: EventFormInputs) =>
       editEvent(id, title, location.value, online, description, category, start, end, isPrivate),
     {
       onError: (err: FetchError) => {
@@ -60,10 +64,14 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
     }
   );
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit: SubmitHandler<EventFormInputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -80,7 +88,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
       {errors.title && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
       {errors.title?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">Title is too long</div>}
 
-      <LocationAutocomplete id="location" label="Location" defaultValue={defaultValues.location} control={control} />
+      <LocationAutocomplete id="location" label="Location" defaultValue={defaultLocation} control={control} />
 
       <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
 
@@ -125,10 +133,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
 
       <ToggleSwitch id="isPrivate" label="Private" enabled={isPrivate} register={register} />
 
-      <button
-        type="submit"
-        className="w-full bg-green-500 rounded-md border border-green-600 text-white px-3.5 py-2 mt-4 disabled:opacity-50"
-      >
+      <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50">
         Edit Event
       </button>
     </form>

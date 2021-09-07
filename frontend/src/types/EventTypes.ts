@@ -34,3 +34,14 @@ export interface EventFilters {
   hideOnline: boolean;
   hideNoLocation: boolean;
 };
+
+export interface EventFormInputs {
+  title: string;
+  location: { value: string; label: string };
+  online: boolean;
+  description: string;
+  category: string;
+  start: Date;
+  end: Date;
+  isPrivate: boolean;
+};

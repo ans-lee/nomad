@@ -83,17 +83,20 @@ const EventInfo: React.FC = () => {
             {getLocationComponent(details.location)}
             {getDescriptionComponent(details.description)}
             {details.createdBy === userID && (
-              <>
-                <button className="w-full bg-blue-500 rounded-md border border-blue-600 text-white px-3.5 py-2 mt-4">
+              <div className="flex">
+                <button
+                  className="w-full bg-secondary rounded-md text-white px-3.5 py-2 mt-4 mr-24"
+                  onClick={() => (window.location.href = `/event/edit/${id}`)}
+                >
                   Edit
                 </button>
                 <button
-                  className="w-full bg-red-500 rounded-md border border-red-600 text-white px-3.5 py-2 mt-4"
+                  className="w-full bg-danger rounded-md text-white px-3.5 py-2 mt-4"
                   onClick={() => handleDelete()}
                 >
                   Delete
                 </button>
-              </>
+              </div>
             )}
           </>
         )}
