@@ -10,6 +10,7 @@ import { useMutation } from 'react-query';
 import { createEvent, FetchError } from 'src/api';
 import Alert from 'src/components/Alert';
 import LocationAutocomplete from './LocationAutocomplete';
+import {useHistory} from 'react-router-dom';
 
 type Inputs = {
   title: string;
@@ -24,6 +25,8 @@ type Inputs = {
 
 const CreateEventForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+  const history = useHistory();
+
   const {
     register,
     formState: { errors },
@@ -34,10 +37,12 @@ const CreateEventForm: React.FC = () => {
   const isOnline = watch('online');
   const startTime = watch('start');
   const isPrivate = watch('isPrivate');
+
   const mutation = useMutation(
     ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
       createEvent(title, location.value, online, description, category, start, end, isPrivate),
     {
+      onSuccess: () => history.push('/profile'),
       onError: (err: FetchError) => {
         if (err.res.status === 401) {
           setErrMsg('You are not authorized to make an event');
@@ -74,7 +79,7 @@ const CreateEventForm: React.FC = () => {
       <TextArea
         id="description"
         label="Description"
-        validation={{ maxLength: 512 }}
+        validation={{ maxLength: 20000 }}
         error={'description' in errors}
         register={register}
       />

@@ -10,7 +10,7 @@ import LocationAutocomplete from './LocationAutocomplete';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { EventData, EventFormInputs } from 'src/types/EventTypes';
 
 interface PageParams {
@@ -20,6 +20,7 @@ interface PageParams {
 const EditEventForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
   const [defaultLocation, setDefaultLocation] = useState({ value: '', label: '' });
+  const history = useHistory();
   const { id } = useParams<PageParams>();
 
   const {
@@ -54,6 +55,7 @@ const EditEventForm: React.FC = () => {
     ({ title, location, online, description, category, start, end, isPrivate }: EventFormInputs) =>
       editEvent(id, title, location.value, online, description, category, start, end, isPrivate),
     {
+      onSuccess: () => history.push(`/event/${id}`),
       onError: (err: FetchError) => {
         if (err.res.status === 401) {
           setErrMsg('You are not authorized to make an event');
@@ -95,7 +97,7 @@ const EditEventForm: React.FC = () => {
       <TextArea
         id="description"
         label="Description"
-        validation={{ maxLength: 512 }}
+        validation={{ maxLength: 20000 }}
         error={'description' in errors}
         register={register}
       />
