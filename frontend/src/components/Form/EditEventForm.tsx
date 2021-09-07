@@ -4,12 +4,17 @@ import { useMutation } from 'react-query';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
 import { OPTIONS } from 'src/constants/EventConstants';
-import { createEvent, FetchError } from 'src/api';
+import { editEvent, FetchError } from 'src/api';
 import Alert from 'src/components/Alert';
 import LocationAutocomplete from './LocationAutocomplete';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
+import { useParams } from 'react-router-dom';
+
+interface PageParams {
+  id: string;
+}
 
 type Inputs = {
   title: string;
@@ -28,6 +33,7 @@ interface EditEventFormProps {
 
 const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
   const [errMsg, setErrMsg] = useState('');
+  const { id } = useParams<PageParams>();
 
   const {
     register,
@@ -42,7 +48,7 @@ const EditEventForm: React.FC<EditEventFormProps> = ({ defaultValues }) => {
 
   const mutation = useMutation(
     ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
-      createEvent(title, location.value, online, description, category, start, end, isPrivate),
+      editEvent(id, title, location.value, online, description, category, start, end, isPrivate),
     {
       onError: (err: FetchError) => {
         if (err.res.status === 401) {

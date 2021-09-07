@@ -36,7 +36,6 @@ const EditEventPage: React.FC = () => {
 
   const { isLoading } = useQuery(['event'], () => getEvent(id), {
     onSuccess: (data: EventData) => {
-      console.log(data.location);
       setDefaultValues({
         title: data.title,
         location: { value: data.location, label: data.location },

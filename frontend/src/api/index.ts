@@ -99,6 +99,41 @@ export async function createEvent(
   return response.json();
 }
 
+export async function editEvent(
+  id: string,
+  title: string,
+  location: string,
+  online: boolean,
+  description: string,
+  category: string,
+  start: Date,
+  end: Date,
+  isPrivate: boolean
+): Promise<{ message: string }> {
+  const response = await fetch(`${API_PATH}/event/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: getAuthToken(),
+    },
+    body: JSON.stringify({
+      title: title,
+      location: location,
+      online: online,
+      description: description,
+      category: category,
+      start: start.toISOString(),
+      end: end.toISOString(),
+      visibility: isPrivate ? 'private' : 'public',
+    }),
+  });
+
+  if (!response.ok) {
+    throw new FetchError(response);
+  }
+  return response.json();
+}
+
 export async function getAllEvents(
   ne: Coords,
   sw: Coords,

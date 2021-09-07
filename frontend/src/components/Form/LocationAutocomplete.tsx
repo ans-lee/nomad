@@ -7,7 +7,7 @@ import { getLocationSuggestions } from 'src/api';
 interface LocationAutcompleteProps {
   id: string;
   label: string;
-  defaultValue?: { value: string; label: string; };
+  defaultValue?: { value: string; label: string };
   control: Control<any>; // eslint-disable-line
 }
 
