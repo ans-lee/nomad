@@ -5,6 +5,7 @@ import { FetchError, userLogin } from 'src/api';
 import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
 import Alert from 'src/components/Alert';
 import Input from 'src/components/Form/Input';
+import { Redirect } from 'react-router-dom';
 
 type Inputs = {
   email: string;
@@ -13,11 +14,13 @@ type Inputs = {
 
 const LoginForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<Inputs>();
+
   const mutation = useMutation(({ email, password }: Inputs) => userLogin(email, password), {
     onSuccess: (data) => {
       window.localStorage.setItem(LOGIN_TOKEN_NAME, data.token);
@@ -30,10 +33,15 @@ const LoginForm: React.FC = () => {
       }
     },
   });
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
   };
+
+  if (mutation.isSuccess) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

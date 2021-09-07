@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
+import { Redirect } from 'react-router-dom';
 import { FetchError, userSignUp } from 'src/api';
 import Alert from 'src/components/Alert';
 import Input from 'src/components/Form/Input';
@@ -15,6 +16,7 @@ type Inputs = {
 
 const SignUpForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+
   const {
     register,
     formState: { errors },
@@ -22,6 +24,7 @@ const SignUpForm: React.FC = () => {
     watch,
   } = useForm<Inputs>();
   const password = watch('password');
+
   const mutation = useMutation(
     ({ email, password, firstName, lastName }: Inputs) => userSignUp(email, password, firstName, lastName),
     {
@@ -34,10 +37,15 @@ const SignUpForm: React.FC = () => {
       },
     }
   );
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
   };
+
+  if (mutation.isSuccess) {
+    return <Redirect to="/login" />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
