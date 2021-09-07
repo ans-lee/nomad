@@ -36,7 +36,9 @@ const EventInfo: React.FC = () => {
     start: new Date(),
     end: new Date(),
   });
+
   const { id } = useParams<PageParams>();
+
   const { isLoading } = useQuery(['event'], () => getEvent(id), {
     onSuccess: (data: EventData) => setDetails(parseEventData(data)),
   });

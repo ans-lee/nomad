@@ -35,12 +35,24 @@ const authLinks = [
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+
   const { firstName } = useStore((state) => state.userDetails);
   const setUserDetails = useStore((state) => state.setUserDetails);
+  const setUserAuthenticated = useStore((state) => state.setUserAuthenticated);
+
   useQuery('userMyself', getUserMyself, {
-    onSuccess: (data: UserDetails) => setUserDetails({ ...data }),
+    onSuccess: (data: UserDetails) => {
+      setUserDetails({ ...data });
+      setUserAuthenticated(true);
+    },
+    onError: () => {
+      setUserDetails({ email: '', firstName: '', lastName: '' });
+      setUserAuthenticated(false);
+    },
     refetchOnWindowFocus: false,
+    retry: false,
   });
+
   const toggle = () => setIsOpen(!isOpen);
 
   const LogoContainer: React.FC = () => (
