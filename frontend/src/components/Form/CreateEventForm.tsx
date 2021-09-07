@@ -10,7 +10,7 @@ import { useMutation } from 'react-query';
 import { createEvent, FetchError } from 'src/api';
 import Alert from 'src/components/Alert';
 import LocationAutocomplete from './LocationAutocomplete';
-import {useHistory} from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 type Inputs = {
   title: string;
@@ -117,10 +117,7 @@ const CreateEventForm: React.FC = () => {
 
       <ToggleSwitch id="isPrivate" label="Private" enabled={isPrivate} register={register} />
 
-      <button
-        type="submit"
-        className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50"
-      >
+      <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50">
         Create Event
       </button>
     </form>

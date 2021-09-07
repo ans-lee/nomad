@@ -7,6 +7,7 @@ import EventPage from './pages/Event';
 import HomePage from './pages/Home';
 import LoginPage from './pages/Login';
 import LogoutPage from './pages/Logout';
+import NotFoundPage from './pages/NotFound';
 import ProfilePage from './pages/Profile';
 import SearchEventsPage from './pages/SearchEvents';
 import SignUpPage from './pages/SignUp';
@@ -56,6 +57,16 @@ const routes = [
     route: '/profile',
     component: ProfilePage,
     authRequired: true,
+  },
+  {
+    route: '/profile',
+    component: ProfilePage,
+    authRequired: true,
+  },
+  {
+    route: '*',
+    component: NotFoundPage,
+    authRequired: false,
   },
 ];
 
