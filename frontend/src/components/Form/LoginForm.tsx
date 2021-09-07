@@ -77,10 +77,10 @@ const LoginForm: React.FC = () => {
 
       <button
         type="submit"
-        className="w-full bg-green-500 rounded-md border border-green-600 text-white px-3.5 py-2 mt-4 disabled:opacity-50"
+        className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50"
         disabled={mutation.isLoading}
       >
-        {mutation.isLoading ? 'Loading...' : 'Login'}
+        {mutation.isLoading ? 'Logging in...' : 'Login'}
       </button>
     </form>
   );

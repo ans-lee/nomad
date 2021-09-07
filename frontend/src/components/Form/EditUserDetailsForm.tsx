@@ -86,10 +86,7 @@ const EditUserDetailsForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">Last name is too long</div>
       )}
 
-      <button
-        type="submit"
-        className="w-full bg-green-500 rounded-md border border-green-600 text-white px-3.5 py-2 mt-4 disabled:opacity-50"
-      >
+      <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50">
         Edit Details
       </button>
     </form>

@@ -42,7 +42,8 @@ const EventsContainer: React.FC = () => {
     'justify-center',
     'inset-x-1/2',
     'bottom-24',
-    'bg-white',
+    'bg-primary',
+    'text-white',
     'rounded-2xl',
     'p-2',
     'w-24'
@@ -55,13 +56,13 @@ const EventsContainer: React.FC = () => {
     'flex',
     'items-center',
     'justify-center',
-    'bg-black',
+    'bg-secondary',
     'text-white',
     'rounded-2xl',
     'p-2',
     'mx-auto',
     'my-6',
-    'w-24'
+    'w-28'
   );
 
   return (
