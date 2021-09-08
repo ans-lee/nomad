@@ -6,7 +6,7 @@ import { getLocation } from 'src/api';
 import Input from 'src/components/Form/Input';
 import Select from 'src/components/Form/Select';
 import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
-import { OPTIONS } from 'src/constants/EventConstants';
+import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
 import ToggleSwitch from './ToggleSwitch';
 
@@ -59,7 +59,7 @@ const FiltersForm: React.FC<{ hideLocation?: boolean }> = ({ hideLocation }) => 
     <form onSubmit={handleSubmit(onSubmit)}>
       {!hideLocation && <LocationAutocomplete id="location" label="Location" control={control} />}
       <Input type="text" id="title" label="Title" register={register} />
-      <Select id="category" label="Category" register={register} options={OPTIONS} />
+      <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
       <ToggleSwitch id="hideOnline" label="Hide online events" enabled={watchHideOnline} register={register} />
       <ToggleSwitch
         id="hideNoLocation"

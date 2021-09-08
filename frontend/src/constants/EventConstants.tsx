@@ -1,4 +1,4 @@
-export const OPTIONS = [
+export const CATEGORY_OPTIONS = [
   {
     text: 'None',
     value: 'none',

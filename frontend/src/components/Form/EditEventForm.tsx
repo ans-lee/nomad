@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation, useQuery } from 'react-query';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
-import { OPTIONS } from 'src/constants/EventConstants';
+import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
 import { editEvent, FetchError, getEvent } from 'src/api';
 import Alert from 'src/components/Alert';
 import LocationAutocomplete from './LocationAutocomplete';
@@ -105,7 +105,7 @@ const EditEventForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">Description is too long</div>
       )}
 
-      <Select id="category" label="Category" register={register} options={OPTIONS} />
+      <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
 
       <DatePicker
         id="start"

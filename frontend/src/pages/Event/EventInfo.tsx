@@ -81,7 +81,8 @@ const EventInfo: React.FC = () => {
               No Image
             </div>
             <div className="text-3xl mb-2">{details.title}</div>
-            <div className="text-xl mb-2">{getDuration(details.start, details.end)}</div>
+            {details.category !== 'none' && <span className="rounded-full bg-blue-200 px-2">{details.category}</span>}
+            <div className="text-xl my-2">{getDuration(details.start, details.end)}</div>
             {getLocationComponent(details.location)}
             {getDescriptionComponent(details.description)}
             {details.createdBy === userID && (

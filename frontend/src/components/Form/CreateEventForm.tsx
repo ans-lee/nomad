@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
-import { OPTIONS } from 'src/constants/EventConstants';
+import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
 import Select from './Select';
 import TextArea from './TextArea';
 import ToggleSwitch from './ToggleSwitch';
@@ -87,7 +87,7 @@ const CreateEventForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">Description is too long</div>
       )}
 
-      <Select id="category" label="Category" register={register} options={OPTIONS} />
+      <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
 
       <DatePicker
         id="start"

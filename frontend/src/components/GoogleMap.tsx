@@ -7,9 +7,10 @@ import { MAP_STLYES, DEFAULT_ZOOM } from 'src/constants/GoogleMapConstants';
 import { EventDetails } from 'src/types/EventTypes';
 import { useStore } from 'src/store';
 
-//TODO add some variance on the mapmarkers
 const getLocations = (events: EventDetails[]) =>
-  events.map((item, key) => <MapMarker title={item.title} lat={item.lat} lng={item.lng} key={key} />);
+  events.map((item, key) => (
+    <MapMarker title={item.title} category={item.category} lat={item.lat} lng={item.lng} key={key} />
+  ));
 
 const GoogleMap: React.FC = () => {
   const events = useStore((state) => state.events);
