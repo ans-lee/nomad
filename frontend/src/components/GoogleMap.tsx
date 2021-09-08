@@ -9,7 +9,7 @@ import { useStore } from 'src/store';
 
 const getLocations = (events: EventDetails[]) =>
   events.map((item, key) => (
-    <MapMarker title={item.title} category={item.category} lat={item.lat} lng={item.lng} key={key} />
+    <MapMarker id={item.id} title={item.title} category={item.category} lat={item.lat} lng={item.lng} key={key} />
   ));
 
 const GoogleMap: React.FC = () => {

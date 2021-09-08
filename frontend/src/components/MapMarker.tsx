@@ -1,15 +1,17 @@
 import classNames from 'classnames';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
 
 interface MapMarkerProps {
+  id: string;
   title: string;
   category: string;
   lat: number;
   lng: number;
 }
 
-const MapMarker: React.FC<MapMarkerProps> = ({ title, category }) => {
+const MapMarker: React.FC<MapMarkerProps> = ({ id, title, category }) => {
   const markerClasses = classNames(
     'rounded-full',
     category === CATEGORY_OPTIONS[0].value ? 'bg-gray-500' : '',
@@ -29,11 +31,16 @@ const MapMarker: React.FC<MapMarkerProps> = ({ title, category }) => {
     'flex',
     'items-center',
     'justify-center',
+    'cursor-pointer',
     'truncate',
     'shadow-md'
   );
 
-  return <div className={markerClasses}>{title}</div>;
+  return (
+    <Link to={`/event/${id}`} className={markerClasses}>
+      {title}
+    </Link>
+  );
 };
 
 export default MapMarker;

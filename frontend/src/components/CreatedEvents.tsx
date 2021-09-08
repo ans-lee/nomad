@@ -16,13 +16,13 @@ const CreatedEvents: React.FC = () => {
   });
 
   return (
-    <div className="flex flex-col w-full h-full px-4 py-8">
-      <div>Created Events</div>
+    <div className="flex flex-col w-full h-full p-8">
+      <div className="text-4xl mb-8">Created Events</div>
       {isLoading && <div>Loading...</div>}
       {!isLoading &&
         events.map((item, key) => (
-          <Link to={`/event/${item.id}`} key={key}>
-            <div className="text-xl mb-2">{item.title}</div>
+          <Link className="text-xl mb-4 shadow-md rounded-md bg-gray-100 p-4" to={`/event/${item.id}`} key={key}>
+            {item.title}
           </Link>
         ))}
     </div>
