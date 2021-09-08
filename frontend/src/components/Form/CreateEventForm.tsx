@@ -11,6 +11,7 @@ import { createEvent, FetchError } from 'src/api';
 import Alert from 'src/components/Alert';
 import LocationAutocomplete from './LocationAutocomplete';
 import { useHistory } from 'react-router-dom';
+import Label from './Label';
 
 type Inputs = {
   title: string;
@@ -61,10 +62,10 @@ const CreateEventForm: React.FC = () => {
     <form onSubmit={handleSubmit(onSubmit)}>
       {mutation.isError && <Alert text={errMsg} />}
 
+      <Label id="title" text="Title" required={true} />
       <Input
         type="text"
         id="title"
-        label="Title *"
         validation={{ required: true, maxLength: 128 }}
         error={'title' in errors}
         register={register}
@@ -72,7 +73,8 @@ const CreateEventForm: React.FC = () => {
       {errors.title && <div className="text-sm text-red-500 -mt-2 mb-2">This field is required</div>}
       {errors.title?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">Title is too long</div>}
 
-      <LocationAutocomplete id="location" label="Location" control={control} />
+      <Label id="location" text="Location" />
+      <LocationAutocomplete id="location" control={control} />
 
       <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
 
@@ -89,18 +91,13 @@ const CreateEventForm: React.FC = () => {
 
       <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
 
-      <DatePicker
-        id="start"
-        label="Start Time *"
-        validation={{ required: true }}
-        error={'start' in errors}
-        control={control}
-      />
+      <Label id="start" text="Start Time" required={true} />
+      <DatePicker id="start" validation={{ required: true }} error={'start' in errors} control={control} />
       {errors.start && <div className="text-sm text-red-500 -mt-2 mb-2">You must pick a start time</div>}
 
+      <Label id="end" text="End Time" required={true} />
       <DatePicker
         id="end"
-        label="End Time *"
         validation={{
           required: true,
           validate: (value: Date) => value.getTime() >= startTime.getTime(),

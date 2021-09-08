@@ -50,7 +50,7 @@ const LoginForm: React.FC = () => {
       <Input
         type="text"
         id="email"
-        label="Email"
+        placeholder="Email"
         validation={{
           required: true,
           validate: (value: string) => value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/) !== null,
@@ -66,7 +66,7 @@ const LoginForm: React.FC = () => {
       <Input
         type="password"
         id="password"
-        label="Password"
+        placeholder="Password"
         validation={{ required: true }}
         error={'password' in errors}
         register={register}

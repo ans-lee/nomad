@@ -6,12 +6,11 @@ import { getLocationSuggestions } from 'src/api';
 
 interface LocationAutcompleteProps {
   id: string;
-  label: string;
   defaultValue?: { value: string; label: string };
   control: Control<any>; // eslint-disable-line
 }
 
-const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, defaultValue, control }) => {
+const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, defaultValue, control }) => {
   const [locationInput, setLocationInput] = useState('');
   const { isLoading, data } = useQuery(['suggestions', locationInput], ({ queryKey }) => {
     if (queryKey[1]) {
@@ -21,29 +20,24 @@ const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, d
   });
 
   return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <Controller
-        name={id}
-        control={control}
-        render={({ field: { onChange } }) => (
-          <ReactSelect
-            className="mt-2 mb-4"
-            placeholder="Enter a location..."
-            defaultValue={defaultValue}
-            isClearable={true}
-            onChange={onChange}
-            isLoading={isLoading}
-            onInputChange={(value) => {
-              setLocationInput(value);
-            }}
-            options={data?.locations.map((item) => ({ value: item, label: item }))}
-          />
-        )}
-      />
-    </>
+    <Controller
+      name={id}
+      control={control}
+      render={({ field: { onChange } }) => (
+        <ReactSelect
+          className="mt-2 mb-4"
+          placeholder="Enter a location..."
+          defaultValue={defaultValue}
+          isClearable={true}
+          onChange={onChange}
+          isLoading={isLoading}
+          onInputChange={(value) => {
+            setLocationInput(value);
+          }}
+          options={data?.locations.map((item) => ({ value: item, label: item }))}
+        />
+      )}
+    />
   );
 };
 

@@ -54,7 +54,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="text"
         id="firstName"
-        label="First Name *"
+        placeholder="First Name"
         validation={{ required: true, maxLength: 128 }}
         error={'firstName' in errors}
         register={register}
@@ -67,7 +67,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="text"
         id="lastName"
-        label="Last Name *"
+        placeholder="Last Name"
         validation={{ required: true, maxLength: 128 }}
         error={'lastName' in errors}
         register={register}
@@ -80,7 +80,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="text"
         id="email"
-        label="Email *"
+        placeholder="Email"
         validation={{
           required: true,
           validate: (value: string) => value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/) !== null,
@@ -96,7 +96,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="password"
         id="password"
-        label="Password *"
+        placeholder="Password"
         validation={{ required: true, minLength: 8, maxLength: 128 }}
         error={'password' in errors}
         register={register}
@@ -114,7 +114,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="password"
         id="confirmPassword"
-        label="Confirm Password *"
+        placeholder="Confirm Password"
         validation={{
           required: true,
           validate: (value: string) => value === password,

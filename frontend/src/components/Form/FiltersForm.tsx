@@ -9,6 +9,7 @@ import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
 import ToggleSwitch from './ToggleSwitch';
+import Label from './Label';
 
 type Inputs = {
   location: { value: string; label: string };
@@ -57,16 +58,27 @@ const FiltersForm: React.FC<{ hideLocation?: boolean }> = ({ hideLocation }) => 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {!hideLocation && <LocationAutocomplete id="location" label="Location" control={control} />}
-      <Input type="text" id="title" label="Title" register={register} />
+      {!hideLocation && (
+        <>
+          <Label id="location" text="Location" />
+          <LocationAutocomplete id="location" control={control} />
+        </>
+      )}
+
+      <Label id="title" text="Title" />
+      <Input type="text" id="title" register={register} />
+
       <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
+
       <ToggleSwitch id="hideOnline" label="Hide online events" enabled={watchHideOnline} register={register} />
+
       <ToggleSwitch
         id="hideNoLocation"
         label="Hide events with no location"
         enabled={watchHideNoLocation}
         register={register}
       />
+
       <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 my-4 disabled:opacity-50">
         Search
       </button>

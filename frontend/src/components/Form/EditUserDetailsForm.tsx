@@ -6,6 +6,7 @@ import { FetchError, updateUserDetails } from 'src/api';
 import Alert from 'src/components/Alert';
 import { UserDetails } from 'src/types/UserTypes';
 import { useStore } from 'src/store';
+import Label from './Label';
 
 type Inputs = {
   email: string;
@@ -15,13 +16,16 @@ type Inputs = {
 
 const EditUserDetailsForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+
   const { email, firstName, lastName } = useStore((state) => state.userDetails);
   const setUserDetails = useStore((state) => state.setUserDetails);
+
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<Inputs>({ defaultValues: { email: email, firstName: firstName, lastName: lastName } });
+
   const mutation = useMutation(
     ({ email, firstName, lastName }: Inputs) => updateUserDetails(email, firstName, lastName),
     {
@@ -35,6 +39,7 @@ const EditUserDetailsForm: React.FC = () => {
       },
     }
   );
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
@@ -44,10 +49,10 @@ const EditUserDetailsForm: React.FC = () => {
     <form onSubmit={handleSubmit(onSubmit)}>
       {mutation.isError && <Alert text={errMsg} />}
 
+      <Label id="email" text="Email" />
       <Input
         type="text"
         id="email"
-        label="Email *"
         validation={{
           required: true,
           validate: (value: string) => value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/) !== null,
@@ -60,10 +65,10 @@ const EditUserDetailsForm: React.FC = () => {
       )}
       {errors.email?.type === 'validate' && <div className="text-sm text-red-500 -mt-2 mb-2">Email is not valid</div>}
 
+      <Label id="firstName" text="First Name" />
       <Input
         type="text"
         id="firstName"
-        label="First Name *"
         validation={{ required: true, maxLength: 128 }}
         error={'firstName' in errors}
         register={register}
@@ -73,10 +78,10 @@ const EditUserDetailsForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">First name is too long</div>
       )}
 
+      <Label id="lastName" text="Last Name" />
       <Input
         type="text"
         id="lastName"
-        label="Last Name *"
         validation={{ required: true, maxLength: 128 }}
         error={'lastName' in errors}
         register={register}

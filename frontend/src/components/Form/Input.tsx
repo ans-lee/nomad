@@ -4,13 +4,12 @@ import { UseFormRegister } from 'react-hook-form';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  label: string;
   validation?: Record<string, unknown>;
   error?: boolean;
   register: UseFormRegister<any>; // eslint-disable-line
 }
 
-const Input: React.FC<InputProps> = ({ id, label, validation, error, register, ...rest }) => {
+const Input: React.FC<InputProps> = ({ id, validation, error, register, ...rest }) => {
   const classes: string = classNames(
     'w-full',
     'mt-2',
@@ -26,14 +25,7 @@ const Input: React.FC<InputProps> = ({ id, label, validation, error, register, .
     'focus:ring-blue-600'
   );
 
-  return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <input {...register(id, validation)} {...rest} className={classes} />
-    </>
-  );
+  return <input {...register(id, validation)} {...rest} className={classes} />;
 };
 
 export default Input;
