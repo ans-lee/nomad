@@ -1,5 +1,5 @@
 import React from 'react';
-import CreateEventForm from 'src/components/Form/CreateEventForm';
+import CreateEventForm from 'src/forms/CreateEventForm';
 import Header from 'src/components/Header';
 
 const CreateEventPage: React.FC = () => (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LoginForm from 'src/components/Form/LoginForm';
+import LoginForm from 'src/forms/LoginForm';
 
 const LoginPage: React.FC = () => (
   <div className="h-screen w-screen m-auto flex flex-col justify-center sm:w-96">

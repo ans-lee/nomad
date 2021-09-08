@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import SignUpForm from 'src/components/Form/SignUpForm';
+import SignUpForm from 'src/forms/SignUpForm';
 
 const SignUpPage: React.FC = () => (
   <div className="h-screen w-screen m-auto flex flex-col justify-center sm:w-96">

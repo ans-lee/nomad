@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Input from 'src/components/Form/Input';
 import { useMutation } from 'react-query';
 import { FetchError, updateUserDetails } from 'src/api';
-import Alert from 'src/components/Alert';
-import { UserDetails } from 'src/types/UserTypes';
 import { useStore } from 'src/store';
-import Label from './Label';
+import { UserDetails } from 'src/types/UserTypes';
+import Alert from 'src/components/Alert';
+import Input from 'src/components/Form/Input';
+import Label from 'src/components/Form/Label';
 
 type Inputs = {
   email: string;

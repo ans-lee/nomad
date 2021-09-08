@@ -5,7 +5,7 @@ import { getAllEvents } from 'src/api';
 import GoogleMap from 'src/components/GoogleMap';
 import { useStore } from 'src/store';
 import { parseEventDataList } from 'src/utils/EventUtils';
-import FiltersForm from 'src/components/Form/FiltersForm';
+import FiltersForm from 'src/forms/FiltersForm';
 import EventsList from 'src/components/EventsList';
 import { DEFAULT_BOUNDS } from 'src/constants/GoogleMapConstants';
 

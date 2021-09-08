@@ -1,32 +1,28 @@
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { useHistory, useParams } from 'react-router-dom';
+import { useMutation, useQuery } from 'react-query';
+import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
+import { editEvent, FetchError, getEvent } from 'src/api';
+import { EventData, EventFormInputs } from 'src/types/EventTypes';
+import Alert from 'src/components/Alert';
+import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import DatePicker from 'src/components/Form/DatePicker';
 import Input from 'src/components/Form/Input';
-import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
-import Select from './Select';
-import TextArea from './TextArea';
-import ToggleSwitch from './ToggleSwitch';
-import { useMutation } from 'react-query';
-import { createEvent, FetchError } from 'src/api';
-import Alert from 'src/components/Alert';
-import LocationAutocomplete from './LocationAutocomplete';
-import { useHistory } from 'react-router-dom';
-import Label from './Label';
+import Select from 'src/components/Form/Select';
+import TextArea from 'src/components/Form/TextArea';
+import ToggleSwitch from 'src/components/Form/ToggleSwitch';
+import Label from 'src/components/Form/Label';
 
-type Inputs = {
-  title: string;
-  location: { value: string; label: string };
-  online: boolean;
-  description: string;
-  category: string;
-  start: Date;
-  end: Date;
-  isPrivate: boolean;
-};
+interface PageParams {
+  id: string;
+}
 
-const CreateEventForm: React.FC = () => {
+const EditEventForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+  const [defaultLocation, setDefaultLocation] = useState({ value: '', label: '' });
   const history = useHistory();
+  const { id } = useParams<PageParams>();
 
   const {
     register,
@@ -34,16 +30,33 @@ const CreateEventForm: React.FC = () => {
     handleSubmit,
     control,
     watch,
-  } = useForm<Inputs>({ defaultValues: { online: true, location: { value: '', label: '' } } });
+    setValue,
+  } = useForm<EventFormInputs>();
   const isOnline = watch('online');
   const startTime = watch('start');
   const isPrivate = watch('isPrivate');
 
+  const { isLoading } = useQuery(['viewEvent'], () => getEvent(id), {
+    onSuccess: (data: EventData) => {
+      setValue('title', data.title);
+      setValue('location', { value: data.location, label: data.location });
+      setDefaultLocation({ value: data.location, label: data.location });
+      setValue('online', data.online);
+      setValue('description', data.description);
+      setValue('category', data.category);
+      setValue('start', new Date(data.start));
+      setValue('end', new Date(data.end));
+      setValue('isPrivate', data.visibility === 'private');
+    },
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
   const mutation = useMutation(
-    ({ title, location, online, description, category, start, end, isPrivate }: Inputs) =>
-      createEvent(title, location.value, online, description, category, start, end, isPrivate),
+    ({ title, location, online, description, category, start, end, isPrivate }: EventFormInputs) =>
+      editEvent(id, title, location.value, online, description, category, start, end, isPrivate),
     {
-      onSuccess: () => history.push('/profile'),
+      onSuccess: () => history.push(`/event/${id}`),
       onError: (err: FetchError) => {
         if (err.res.status === 401) {
           setErrMsg('You are not authorized to make an event');
@@ -53,16 +66,20 @@ const CreateEventForm: React.FC = () => {
       },
     }
   );
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+
+  const onSubmit: SubmitHandler<EventFormInputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {mutation.isError && <Alert text={errMsg} />}
 
-      <Label id="title" text="Title" required={true} />
       <Input
         type="text"
         id="title"
@@ -74,7 +91,7 @@ const CreateEventForm: React.FC = () => {
       {errors.title?.type === 'maxLength' && <div className="text-sm text-red-500 -mt-2 mb-2">Title is too long</div>}
 
       <Label id="location" text="Location" />
-      <LocationAutocomplete id="location" control={control} />
+      <LocationAutocomplete id="location" defaultValue={defaultLocation} control={control} />
 
       <Label id="online" text="Online" />
       <ToggleSwitch id="online" enabled={isOnline} register={register} />
@@ -118,10 +135,10 @@ const CreateEventForm: React.FC = () => {
       <ToggleSwitch id="isPrivate" enabled={isPrivate} register={register} />
 
       <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50">
-        Create Event
+        Edit Event
       </button>
     </form>
   );
 };
 
-export default CreateEventForm;
+export default EditEventForm;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useQuery } from 'react-query';
 import { getUserMyself } from 'src/api';
-import EditUserDetailsForm from 'src/components/Form/EditUserDetailsForm';
 import { useStore } from 'src/store';
 import { UserDetails } from 'src/types/UserTypes';
+import EditUserDetailsForm from 'src/forms/EditUserDetailsForm';
 
 const ProfileContainer: React.FC = () => {
   const { firstName } = useStore((state) => state.userDetails);

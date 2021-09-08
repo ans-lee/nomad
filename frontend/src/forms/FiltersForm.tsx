@@ -3,13 +3,13 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { getLocation } from 'src/api';
-import Input from 'src/components/Form/Input';
-import Select from 'src/components/Form/Select';
-import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
 import { CATEGORY_OPTIONS } from 'src/constants/EventConstants';
 import { useStore } from 'src/store';
-import ToggleSwitch from './ToggleSwitch';
-import Label from './Label';
+import LocationAutocomplete from 'src/components/Form/LocationAutocomplete';
+import Input from 'src/components/Form/Input';
+import Select from 'src/components/Form/Select';
+import ToggleSwitch from 'src/components/Form/ToggleSwitch';
+import Label from 'src/components/Form/Label';
 
 type Inputs = {
   location: { value: string; label: string };
