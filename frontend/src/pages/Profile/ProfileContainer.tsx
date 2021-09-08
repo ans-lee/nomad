@@ -4,7 +4,6 @@ import { getUserMyself } from 'src/api';
 import EditUserDetailsForm from 'src/components/Form/EditUserDetailsForm';
 import { useStore } from 'src/store';
 import { UserDetails } from 'src/types/UserTypes';
-import CreatedEvents from './CreatedEvents';
 
 const ProfileContainer: React.FC = () => {
   const { firstName } = useStore((state) => state.userDetails);
@@ -26,13 +25,12 @@ const ProfileContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full h-full px-4 py-8">
-      <div className="mx-72">
+      <div className="w-1/3 mx-auto">
         {isLoading && <div>Loading...</div>}
         {!isLoading && (
           <>
-            <div className="text-4xl mb-2">{`Welcome, ${firstName}`}</div>
+            <div className="text-4xl mb-8">{`Welcome, ${firstName}`}</div>
             <EditUserDetailsForm />
-            <CreatedEvents />
           </>
         )}
       </div>

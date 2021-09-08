@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import CreatedEventsPage from './pages/CreatedEvents';
 import CreateEventPage from './pages/CreateEvent';
 import EditEventPage from './pages/EditEvent';
 import EventPage from './pages/Event';
@@ -54,8 +55,8 @@ const routes = [
     authRequired: false,
   },
   {
-    route: '/profile',
-    component: ProfilePage,
+    route: '/profile/created-events',
+    component: CreatedEventsPage,
     authRequired: true,
   },
   {
