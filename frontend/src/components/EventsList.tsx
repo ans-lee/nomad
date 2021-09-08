@@ -28,7 +28,9 @@ const EventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
             <hr className="my-2" />
             <Link to={`/event/${item.id}`}>
               <div className="flex w-full my-10">
-                <div className="rounded-md border border-gray-300 w-2/5 h-48 mr-4"></div>
+                <div className="flex rounded-md border border-gray-300 w-2/5 h-48 mr-4 items-center justify-center">
+                  No Image
+                </div>
                 <div className="flex flex-col w-1/2 h-48">
                   <div className="text-xl mb-2">{item.title}</div>
                   <div className="text-sm mb-2">{getDuration(item.start, item.end)}</div>

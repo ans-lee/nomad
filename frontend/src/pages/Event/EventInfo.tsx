@@ -77,7 +77,9 @@ const EventInfo: React.FC = () => {
         {mutation.isError && <Alert text={errMsg} />}
         {!isLoading && (
           <>
-            <div className="rounded-md border border-gray-300 w-full h-96 mb-4"></div>
+            <div className="flex rounded-md border border-gray-300 w-full h-96 mb-4 items-center justify-center">
+              No Image
+            </div>
             <div className="text-3xl mb-2">{details.title}</div>
             <div className="text-xl mb-2">{getDuration(details.start, details.end)}</div>
             {getLocationComponent(details.location)}

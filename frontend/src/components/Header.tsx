@@ -16,10 +16,6 @@ const links = [
     name: 'Create Event',
     link: '/event/create',
   },
-  {
-    name: 'About',
-    link: '/',
-  },
 ];
 
 const authLinks = [

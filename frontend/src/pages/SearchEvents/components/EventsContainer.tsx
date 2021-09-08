@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { getAllEvents } from 'src/api';
-import SideEventsList from 'src/components/SideEventsList';
 import GoogleMap from 'src/components/GoogleMap';
 import { useStore } from 'src/store';
 import { parseEventDataList } from 'src/utils/EventUtils';
@@ -74,7 +73,7 @@ const EventsContainer: React.FC = () => {
             <hr className="my-2" />
             <div className="text-xl mb-4">Filters</div>
             <FiltersForm />
-            <SideEventsList loading={eventsQuery.isLoading} />
+            <EventsList loading={eventsQuery.isLoading} />
           </div>
           <div className="relative h-full w-3/5">
             <GoogleMap />

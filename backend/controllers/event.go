@@ -364,6 +364,8 @@ func GetAllEvents(c *gin.Context) {
 			continue
 		} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
 			continue
+		} else if time.Now().After(result["end"].(primitive.DateTime).Time()) {
+			continue
 		}
 
 		if val, exist := result["description"]; exist {
@@ -475,6 +477,10 @@ func GetUserCreatedEvents(c *gin.Context) {
 				UTC().
 				Format(time.RFC3339),
 			Visibility: result["visibility"].(string),
+		}
+
+		if time.Now().After(result["end"].(primitive.DateTime).Time()) {
+			continue
 		}
 
 		if val, exist := result["location"]; exist {
