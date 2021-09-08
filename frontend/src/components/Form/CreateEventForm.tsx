@@ -89,7 +89,8 @@ const CreateEventForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">Description is too long</div>
       )}
 
-      <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
+      <Label id="category" text="Category" />
+      <Select id="category" register={register} options={CATEGORY_OPTIONS} />
 
       <Label id="start" text="Start Time" required={true} />
       <DatePicker id="start" validation={{ required: true }} error={'start' in errors} control={control} />

@@ -9,12 +9,11 @@ interface SelectOptions {
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   id: string;
-  label: string;
   options: SelectOptions[];
   register: UseFormRegister<any>; // eslint-disable-line
 }
 
-const Select: React.FC<SelectProps> = ({ id, label, options, register, ...rest }) => {
+const Select: React.FC<SelectProps> = ({ id, options, register, ...rest }) => {
   const classes: string = classNames(
     'w-full',
     'mt-2',
@@ -31,18 +30,13 @@ const Select: React.FC<SelectProps> = ({ id, label, options, register, ...rest }
   );
 
   return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <select {...register(id)} {...rest} className={classes}>
-        {options.map((item, key) => (
-          <option value={item.value} key={key}>
-            {item.text}
-          </option>
-        ))}
-      </select>
-    </>
+    <select {...register(id)} {...rest} className={classes}>
+      {options.map((item, key) => (
+        <option value={item.value} key={key}>
+          {item.text}
+        </option>
+      ))}
+    </select>
   );
 };
 

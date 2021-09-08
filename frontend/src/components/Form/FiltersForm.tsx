@@ -68,7 +68,8 @@ const FiltersForm: React.FC<{ hideLocation?: boolean }> = ({ hideLocation }) => 
       <Label id="title" text="Title" />
       <Input type="text" id="title" register={register} />
 
-      <Select id="category" label="Category" register={register} options={CATEGORY_OPTIONS} />
+      <Label id="category" text="Category" />
+      <Select id="category" register={register} options={CATEGORY_OPTIONS} />
 
       <ToggleSwitch id="hideOnline" label="Hide online events" enabled={watchHideOnline} register={register} />
 
