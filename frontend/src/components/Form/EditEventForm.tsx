@@ -93,7 +93,8 @@ const EditEventForm: React.FC = () => {
       <Label id="location" text="Location" />
       <LocationAutocomplete id="location" defaultValue={defaultLocation} control={control} />
 
-      <ToggleSwitch id="online" label="Online" enabled={isOnline} register={register} />
+      <Label id="online" text="Online" />
+      <ToggleSwitch id="online" enabled={isOnline} register={register} />
 
       <TextArea
         id="description"
@@ -130,7 +131,8 @@ const EditEventForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">End time must be the same or after the start time</div>
       )}
 
-      <ToggleSwitch id="isPrivate" label="Private" enabled={isPrivate} register={register} />
+      <Label id="isPrivate" text="Private" />
+      <ToggleSwitch id="isPrivate" enabled={isPrivate} register={register} />
 
       <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50">
         Edit Event

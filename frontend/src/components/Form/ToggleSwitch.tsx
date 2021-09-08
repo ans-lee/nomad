@@ -4,12 +4,11 @@ import { UseFormRegister } from 'react-hook-form';
 
 interface ToggleSwitchProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  label: string;
   enabled: boolean;
   register: UseFormRegister<any>; // eslint-disable-line
 }
 
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ id, label, enabled, register, ...rest }) => {
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ id, enabled, register, ...rest }) => {
   const backgroundClasses = classNames(
     'h-8',
     'w-14',
@@ -36,15 +35,10 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ id, label, enabled, registe
   );
 
   return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <div className={backgroundClasses}>
-        <div className={handleClasses} />
-        <input type="checkbox" {...register(id)} {...rest} className="opacity-0 h-full w-full" />
-      </div>
-    </>
+    <div className={backgroundClasses}>
+      <div className={handleClasses} />
+      <input type="checkbox" {...register(id)} {...rest} className="opacity-0 h-full w-full" />
+    </div>
   );
 };
 
