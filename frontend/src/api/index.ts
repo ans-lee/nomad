@@ -16,12 +16,6 @@ const getAuthToken = (): string => {
   return token ? token : '';
 };
 
-export async function getPong(): Promise<{ message: string }> {
-  return fetch(`${API_PATH}/pong`, {
-    method: 'GET',
-  }).then((res) => res.json());
-}
-
 export async function userSignUp(
   email: string,
   password: string,
