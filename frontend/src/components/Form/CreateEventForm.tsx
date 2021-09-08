@@ -79,9 +79,9 @@ const CreateEventForm: React.FC = () => {
       <Label id="online" text="Online" />
       <ToggleSwitch id="online" enabled={isOnline} register={register} />
 
+      <Label id="description" text="Description" />
       <TextArea
         id="description"
-        label="Description"
         validation={{ maxLength: 20000 }}
         error={'description' in errors}
         register={register}
