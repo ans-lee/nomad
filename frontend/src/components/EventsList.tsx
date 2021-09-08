@@ -22,6 +22,7 @@ const EventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
 
   return (
     <div className="flex flex-col">
+      {loading && <div className="text-center">Loading...</div>}
       {!loading &&
         events.map((item, key) => (
           <Fragment key={key}>
@@ -41,6 +42,7 @@ const EventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
             </Link>
           </Fragment>
         ))}
+      {!loading && events.length === 0 && <div className="text-center">No events here</div>}
     </div>
   );
 };
