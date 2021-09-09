@@ -6,7 +6,6 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 require('dotenv').config()
 
 module.exports = {
-  mode: 'development',
   entry: path.join(__dirname, 'src/index.tsx'),
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -19,16 +18,6 @@ module.exports = {
     },
     modules: [path.join(__dirname, 'src'), 'node_modules'],
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx'],
-  },
-  devServer: {
-    historyApiFallback: true,
-    hot: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        secure: false,
-      },
-    },
   },
   module: {
     rules: [
@@ -68,9 +57,6 @@ module.exports = {
     },
   },
   plugins: [
-    new webpack.DefinePlugin({
-      ENV_API_URL: JSON.stringify(process.env.DEV_API_URL),
-    }),
     new webpack.EnvironmentPlugin(['GOOGLE_API_KEY']),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'index.html'),
