@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
@@ -31,6 +35,7 @@ func main() {
 	// Connect to MongoDB
 	db.ConnectDB()
 
+	// Ping database to ensure the connection is stable
 	err = db.GetDatabase().Client().Ping(context.Background(), readpref.Primary())
 	if err != nil {
 		log.Fatal("Could not connect to the database!", err)
@@ -42,18 +47,43 @@ func main() {
 
 	// Gin setup
 	router := gin.Default()
+	router.NoRoute(setup404)
 	api := router.Group("/api")
-
 	setupRoutes(api)
 
-	// Use a handler for no route found
-	router.NoRoute(setup404)
-
-	// Start the server
-	if err = router.Run(":5000"); err != nil {
-		log.Fatal("Could not start gin-gonic server!", err)
-		os.Exit(1)
+	server := &http.Server{
+		Addr: ":5000",
+		Handler: router,
 	}
+
+	go func() {
+		if err = server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal("listen: ", err)
+		}
+	}()
+
+	// Listen for signals
+	quit := make(chan os.Signal)
+
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down the server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal("Server force shutdown: ", err)
+	}
+
+	// Disconnect MongoDB
+	err = db.GetDatabase().Client().Disconnect(context.Background())
+	if err != nil {
+		log.Fatal("Could not disconnect MongoDB client: ", err)
+	}
+
+	log.Println("Disconnected MongoDB client")
+	log.Println("Server has been shutdown")
 }
 
 func setupRoutes(router *gin.RouterGroup) {
