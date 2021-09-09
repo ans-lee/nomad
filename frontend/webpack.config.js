@@ -68,6 +68,9 @@ module.exports = {
     },
   },
   plugins: [
+    new webpack.DefinePlugin({
+      ENV_API_URL: JSON.stringify(process.env.DEV_API_URL),
+    }),
     new webpack.EnvironmentPlugin(['GOOGLE_API_KEY']),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'index.html'),

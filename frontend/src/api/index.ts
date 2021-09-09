@@ -3,7 +3,8 @@ import { LOGIN_TOKEN_NAME } from 'src/constants/AuthConstants';
 import { EventData } from 'src/types/EventTypes';
 import { UserDetails } from 'src/types/UserTypes';
 
-const API_PATH = '/api';
+declare const ENV_API_URL: string;
+const API_PATH = ENV_API_URL;
 
 export class FetchError extends Error {
   constructor(public res: Response, message?: string) {
