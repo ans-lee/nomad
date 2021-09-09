@@ -19,9 +19,13 @@ func ValidateCategory(v interface{}, param string) error {
 	str := field.String()
 	categories := []string{
 		EventConstants.CategoryNone,
+		EventConstants.CategoryGallery,
+		EventConstants.CategoryPerformance,
 		EventConstants.CategoryFilm,
 		EventConstants.CategoryHealth,
 		EventConstants.CategoryParty,
+		EventConstants.CategoryMarket,
+		EventConstants.CategoryWorkshop,
 		EventConstants.CategoryOther,
 	}
 

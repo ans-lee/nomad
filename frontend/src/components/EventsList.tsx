@@ -1,43 +1,7 @@
 import React, { Fragment } from 'react';
-import { DAYS } from 'src/constants/EventConstants';
-import { EventDetails, EventsListProps } from 'src/types/EventTypes';
-
-const getDuration = (start: Date, end: Date): string => {
-  const timeNow = new Date();
-  if (start.getFullYear() === timeNow.getFullYear() && start.getFullYear() === end.getFullYear()) {
-    const startStr = start.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    });
-    const endStr = end.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    });
-
-    return `${DAYS[start.getDay()]} ${startStr} - ${DAYS[end.getDay()]} ${endStr}`;
-  }
-
-  const startStr = start.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-  const endStr = end.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
-
-  return `${DAYS[start.getDay()]} ${startStr} - ${DAYS[end.getDay()]} ${endStr}`;
-};
+import { Link } from 'react-router-dom';
+import { useStore } from 'src/store';
+import { getDuration } from 'src/utils/EventUtils';
 
 const getLocationComponent = (location: string) =>
   location ? (
@@ -48,29 +12,39 @@ const getLocationComponent = (location: string) =>
 
 const getDescriptionComponent = (description: string) =>
   description ? (
-    <div className="break words">{description}</div>
+    <div className="truncate">{description}</div>
   ) : (
-    <div className="break words italic text-gray-500">No description specified</div>
+    <div className="truncate italic text-gray-500">No description specified</div>
   );
 
-const getEvents = (events: EventDetails[]) =>
-  events.map((item, key) => (
-    <Fragment key={key}>
-      <hr className="my-2" key={`border ${key}`} />
-      <div className="flex w-full my-10">
-        <div className="rounded-md border border-gray-300 w-72 h-48 mr-4"></div>
-        <div className="flex flex-col w-3/5">
-          <div className="text-xl mb-2">{item.title}</div>
-          <div className="text-sm mb-2">{getDuration(item.start, item.end)}</div>
-          {getLocationComponent(item.location)}
-          {getDescriptionComponent(item.description)}
-        </div>
-      </div>
-    </Fragment>
-  ));
+const EventsList: React.FC<{ loading: boolean }> = ({ loading }) => {
+  const events = useStore((state) => state.events);
 
-const EventsList: React.FC<EventsListProps> = ({ loading, events }) => {
-  return <div className="flex flex-col">{!loading && getEvents(events)}</div>;
+  return (
+    <div className="flex flex-col">
+      {loading && <div className="text-center">Loading...</div>}
+      {!loading &&
+        events.map((item, key) => (
+          <Fragment key={key}>
+            <hr className="my-2" />
+            <Link to={`/event/${item.id}`}>
+              <div className="flex w-full my-10">
+                <div className="flex rounded-md border border-gray-300 w-2/5 h-48 mr-4 items-center justify-center">
+                  No Image
+                </div>
+                <div className="flex flex-col w-1/2 h-48">
+                  <div className="text-xl mb-2">{item.title}</div>
+                  <div className="text-sm mb-2">{getDuration(item.start, item.end)}</div>
+                  {getLocationComponent(item.location)}
+                  {getDescriptionComponent(item.description)}
+                </div>
+              </div>
+            </Link>
+          </Fragment>
+        ))}
+      {!loading && events.length === 0 && <div className="text-center">No events here</div>}
+    </div>
+  );
 };
 
 export default EventsList;

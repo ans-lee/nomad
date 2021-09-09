@@ -1,51 +1,43 @@
-import classNames from 'classnames';
-import React from 'react';
-import ReactGoogleAutocomplete from 'react-google-autocomplete';
-import { Control, Controller, UseFormSetValue } from 'react-hook-form';
+import React, { useState } from 'react';
+import ReactSelect from 'react-select';
+import { Control, Controller } from 'react-hook-form';
+import { useQuery } from 'react-query';
+import { getLocationSuggestions } from 'src/api';
 
 interface LocationAutcompleteProps {
   id: string;
-  label: string;
+  defaultValue?: { value: string; label: string };
   control: Control<any>; // eslint-disable-line
-  setValue: UseFormSetValue<any>; // eslint-disable-line
 }
 
-const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, label, control, setValue }) => {
-  const classes: string = classNames(
-    'w-full',
-    'mt-2',
-    'mb-4',
-    'px-3.5',
-    'py-1',
-    'outline-none',
-    'rounded-md',
-    'border',
-    'border-gray-300',
-    'border-gray-300',
-    'focus:ring-2',
-    'focus:ring-blue-600'
-  );
+const LocationAutocomplete: React.FC<LocationAutcompleteProps> = ({ id, defaultValue, control }) => {
+  const [locationInput, setLocationInput] = useState('');
+  const { isLoading, data } = useQuery(['suggestions', locationInput], ({ queryKey }) => {
+    if (queryKey[1]) {
+      return getLocationSuggestions(queryKey[1]);
+    }
+    return { locations: [] };
+  });
 
   return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <Controller
-        name={id}
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <ReactGoogleAutocomplete
-            apiKey={process.env.GOOGLE_API_KEY}
-            className={classes}
-            onChange={onChange}
-            options={{ types: ['geocode', 'establishment'] }}
-            onPlaceSelected={(place) => setValue(id, place.formatted_address)}
-            inputAutocompleteValue={value}
-          />
-        )}
-      />
-    </>
+    <Controller
+      name={id}
+      control={control}
+      render={({ field: { onChange } }) => (
+        <ReactSelect
+          className="mt-2 mb-4"
+          placeholder="Enter a location..."
+          defaultValue={defaultValue}
+          isClearable={true}
+          onChange={onChange}
+          isLoading={isLoading}
+          onInputChange={(value) => {
+            setLocationInput(value);
+          }}
+          options={data?.locations.map((item) => ({ value: item, label: item }))}
+        />
+      )}
+    />
   );
 };
 

@@ -4,13 +4,12 @@ import { UseFormRegister } from 'react-hook-form';
 
 interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   id: string;
-  label: string;
   validation?: Record<string, unknown>;
   error?: boolean;
   register: UseFormRegister<any>; // eslint-disable-line
 }
 
-const TextArea: React.FC<TextAreaProps> = ({ id, label, validation, error, register, ...rest }) => {
+const TextArea: React.FC<TextAreaProps> = ({ id, validation, error, register, ...rest }) => {
   const classes: string = classNames(
     'w-full',
     'mt-2',
@@ -25,14 +24,7 @@ const TextArea: React.FC<TextAreaProps> = ({ id, label, validation, error, regis
     'focus:ring-blue-600'
   );
 
-  return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <textarea {...register(id, validation)} {...rest} className={classes} />
-    </>
-  );
+  return <textarea {...register(id, validation)} {...rest} className={classes} />;
 };
 
 export default TextArea;

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -97,6 +96,7 @@ func CreateEvent(c *gin.Context) {
 	})
 }
 
+//TODO check whether user was the person who created the event
 func EditEvent(c *gin.Context) {
 	var data serializers.EditEventSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
@@ -232,15 +232,13 @@ func GetEvent(c *gin.Context) {
 		"start":       event.Start.Time().UTC(),
 		"end":         event.End.Time().UTC(),
 		"visibility":  event.Visibility,
+		"createdBy":   event.CreatedBy.Hex(),
 		"groupID":     groupIDStr,
 	})
 }
 
 func GetAllEvents(c *gin.Context) {
 	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
-	/*
-	category := c.Param("category")
-	*/
 	var neLat float64
 	var neLng float64
 	var swLat float64
@@ -287,6 +285,11 @@ func GetAllEvents(c *gin.Context) {
 		}
 	}
 
+	category := c.Query("category")
+	title := c.Query("title")
+	hideOnline := c.Query("hideOnline")
+	hasLocation := c.Query("hasLocation")
+
 	cursor, err := db.GetCollection(EventModel.CollectionName).
 		Find(context.Background(), filter)
 	// TODO check whether no events returns error or not
@@ -307,7 +310,7 @@ func GetAllEvents(c *gin.Context) {
 		return
 	}
 
-	var events []serializers.GetEventSchema
+	events := make([]serializers.GetEventSchema, 0)
 	for _, result := range results {
 		event := serializers.GetEventSchema{
 			ID: result["_id"].(primitive.ObjectID).Hex(),
@@ -327,13 +330,6 @@ func GetAllEvents(c *gin.Context) {
 			Visibility: result["visibility"].(string),
 		}
 
-		/*
-		// Check if category matches
-		if category != result["category"] {
-			continue
-		}
-		*/
-
 		if val, exist := result["location"]; exist {
 			event.Location = val.(string)
 			req := &maps.GeocodingRequest{
@@ -352,12 +348,24 @@ func GetAllEvents(c *gin.Context) {
 				event.Lng = coords[0].Geometry.Location.Lng
 
 				if !withinBounds(swLng, swLat, neLng, neLat, event.Lng, event.Lat) {
-					log.Println(event.Title)
 					continue
 				}
 			} else {
 				continue
 			}
+		}
+
+		// Filtering
+		if hideOnline == "true" && event.Online {
+			continue
+		} else if hasLocation == "true" && event.Location == "" {
+			continue
+		} else if category != "" && category != EventConstants.CategoryNone && category != event.Category {
+			continue
+		} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
+			continue
+		} else if time.Now().After(result["end"].(primitive.DateTime).Time()) {
+			continue
 		}
 
 		if val, exist := result["description"]; exist {
@@ -376,25 +384,9 @@ func GetAllEvents(c *gin.Context) {
 	})
 }
 
-func GetEventCoords(c *gin.Context) {
-	filter := bson.M{
-		"visibility": EventConstants.VisibilityPublic,
-		"location": bson.M{"$exists": true},
-	}
-
-	cursor, err := db.GetCollection(EventModel.CollectionName).
-		Find(context.Background(), filter)
-	// TODO check whether no events returns error or not
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": ResponseConstants.InvalidEventIDMessage,
-		})
-
-		return
-	}
-
-	var results []bson.M
-	if err = cursor.All(context.Background(), &results); err != nil {
+func GetLocationCoords(c *gin.Context) {
+	input, exist := c.GetQuery("input")
+	if !exist {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": ResponseConstants.InternalServerErrorMessage,
 		})
@@ -402,35 +394,22 @@ func GetEventCoords(c *gin.Context) {
 		return
 	}
 
-	var events []serializers.EventCoordsSchema
-	for _, result := range results {
-		req := &maps.GeocodingRequest{
-			Address: result["location"].(string),
-		}
+	req := &maps.GeocodingRequest{
+		Address: input,
+	}
 
-		coords, err := gmap.GetClient().Geocode(context.Background(), req)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": ResponseConstants.InternalServerErrorMessage,
-			})
-		}
+	coords, err := gmap.GetClient().Geocode(context.Background(), req)
+	if err != nil || len(coords) < 1 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
 
-		event := serializers.EventCoordsSchema{
-			ID: result["_id"].(primitive.ObjectID).Hex(),
-			Title: result["title"].(string),
-			Category: result["category"].(string),
-		}
-
-		if (len(coords) > 0) {
-			event.Lat = coords[0].Geometry.Location.Lat
-			event.Lng = coords[0].Geometry.Location.Lng
-		}
-
-		events = append(events, event)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"events": events,
+		"lat": coords[0].Geometry.Location.Lat,
+		"lng": coords[0].Geometry.Location.Lng,
 	})
 }
 
@@ -453,6 +432,115 @@ func GetLocationSuggestions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"locations": result,
+	})
+}
+
+func GetUserCreatedEvents(c *gin.Context) {
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	filter := bson.M{"createdBy": userID}
+
+	cursor, err := db.GetCollection(EventModel.CollectionName).
+		Find(context.Background(), filter)
+	// TODO check whether no events returns error or not
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	var results []bson.M
+	if err = cursor.All(context.Background(), &results); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
+
+		return
+	}
+
+	events := make([]serializers.GetEventSchema, 0)
+	for _, result := range results {
+		event := serializers.GetEventSchema{
+			ID: result["_id"].(primitive.ObjectID).Hex(),
+			Title: result["title"].(string),
+			Online: result["online"].(bool),
+			Category: result["category"].(string),
+			Start: result["start"].
+				(primitive.DateTime).
+				Time().
+				UTC().
+				Format(time.RFC3339),
+			End: result["end"].
+				(primitive.DateTime).
+				Time().
+				UTC().
+				Format(time.RFC3339),
+			Visibility: result["visibility"].(string),
+		}
+
+		if time.Now().After(result["end"].(primitive.DateTime).Time()) {
+			continue
+		}
+
+		if val, exist := result["location"]; exist {
+			event.Location = val.(string)
+		}
+
+		if val, exist := result["description"]; exist {
+			event.Description = val.(string)
+		}
+
+		if val, exist := result["groupID"]; exist {
+			event.GroupID = val.(primitive.ObjectID).Hex()
+		}
+
+		events = append(events, event)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+	})
+}
+
+func DeleteEvent(c *gin.Context) {
+	var event EventModel.Event
+
+	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": eventID}
+
+	err := db.GetCollection(EventModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&event)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	if userID.(primitive.ObjectID) != event.CreatedBy {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not have permission to delete this event.",
+		})
+
+		return
+	}
+
+	result, err := db.GetCollection(EventModel.CollectionName).
+		DeleteOne(context.Background(), filter)
+	if err != nil || result.DeletedCount != 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Event deleted!",
 	})
 }
 
@@ -543,6 +631,11 @@ func userCanAccessEvent(userID, groupID primitive.ObjectID) bool {
 }
 
 func withinBounds(x1, y1, x2, y2, pointX, pointY float64) bool {
+	// If all bounds are 0
+	if (x1 + y1 + x2 + y2 == 0) {
+		return true
+	}
+
 	withinX := pointX > x1 && pointX < x2
 	withinY := pointY > y1 && pointY < y2
 	return withinX && withinY

@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from 'src/components/Header';
-import EventsContainer from './components/EventsContainer';
+import EventsContainer from './EventsContainer';
 
 const SearchEventsPage: React.FC = () => (
   <>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import SignUpForm from 'src/components/Form/SignUpForm';
+import SignUpForm from 'src/forms/SignUpForm';
 
 const SignUpPage: React.FC = () => (
   <div className="h-screen w-screen m-auto flex flex-col justify-center sm:w-96">
-    <div className="h-screen rounded-md border border-gray-300 p-4 bg-gray-100 sm:h-auto">
+    <div className="h-screen rounded-md border border-gray-300 p-4 bg-white sm:h-auto">
       <h1 className="text-4xl text-center mb-4">Sign Up</h1>
       <SignUpForm />
       <hr className="my-6" />

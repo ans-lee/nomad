@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useMutation } from 'react-query';
+import { Redirect } from 'react-router-dom';
 import { FetchError, userSignUp } from 'src/api';
 import Alert from 'src/components/Alert';
 import Input from 'src/components/Form/Input';
@@ -15,6 +16,7 @@ type Inputs = {
 
 const SignUpForm: React.FC = () => {
   const [errMsg, setErrMsg] = useState('');
+
   const {
     register,
     formState: { errors },
@@ -22,6 +24,7 @@ const SignUpForm: React.FC = () => {
     watch,
   } = useForm<Inputs>();
   const password = watch('password');
+
   const mutation = useMutation(
     ({ email, password, firstName, lastName }: Inputs) => userSignUp(email, password, firstName, lastName),
     {
@@ -34,10 +37,15 @@ const SignUpForm: React.FC = () => {
       },
     }
   );
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     mutation.reset();
     mutation.mutate(data);
   };
+
+  if (mutation.isSuccess) {
+    return <Redirect to="/login" />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -46,7 +54,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="text"
         id="firstName"
-        label="First Name *"
+        placeholder="First Name"
         validation={{ required: true, maxLength: 128 }}
         error={'firstName' in errors}
         register={register}
@@ -59,7 +67,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="text"
         id="lastName"
-        label="Last Name *"
+        placeholder="Last Name"
         validation={{ required: true, maxLength: 128 }}
         error={'lastName' in errors}
         register={register}
@@ -72,7 +80,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="text"
         id="email"
-        label="Email *"
+        placeholder="Email"
         validation={{
           required: true,
           validate: (value: string) => value.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/) !== null,
@@ -88,7 +96,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="password"
         id="password"
-        label="Password *"
+        placeholder="Password"
         validation={{ required: true, minLength: 8, maxLength: 128 }}
         error={'password' in errors}
         register={register}
@@ -106,7 +114,7 @@ const SignUpForm: React.FC = () => {
       <Input
         type="password"
         id="confirmPassword"
-        label="Confirm Password *"
+        placeholder="Confirm Password"
         validation={{
           required: true,
           validate: (value: string) => value === password,
@@ -123,10 +131,10 @@ const SignUpForm: React.FC = () => {
 
       <button
         type="submit"
-        className="w-full bg-green-500 rounded-md border border-green-600 text-white px-3.5 py-2 mt-4 disabled:opacity-50"
+        className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50"
         disabled={mutation.isLoading}
       >
-        {mutation.isLoading ? 'Loading...' : 'Sign Up'}
+        {mutation.isLoading ? 'Signing up...' : 'Sign Up'}
       </button>
     </form>
   );

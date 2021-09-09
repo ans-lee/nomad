@@ -1,4 +1,4 @@
-export const OPTIONS = [
+export const CATEGORY_OPTIONS = [
   {
     text: 'None',
     value: 'none',
@@ -36,5 +36,5 @@ export const OPTIONS = [
     value: 'other',
   },
 ];
-
 export const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const DEFAULT_FILTERS = { title: '', category: 'none' };

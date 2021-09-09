@@ -25,7 +25,7 @@ func createClient() *maps.Client {
 func SetupClient() {
 	dial.Do(func() {
 		client = createClient()
-		log.Println("Connected to MongoDB database!")
+		log.Println("Created Google Map Client!")
 	})
 }
 

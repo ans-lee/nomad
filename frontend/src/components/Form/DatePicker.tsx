@@ -6,13 +6,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 interface DatePickerProps {
   id: string;
-  label: string;
   validation?: Record<string, unknown>;
   error?: boolean;
   control: Control<any>; // eslint-disable-line
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ id, label, validation, error, control }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ id, validation, error, control }) => {
   const classes: string = classNames(
     'w-full',
     'mt-2',
@@ -29,31 +28,26 @@ const DatePicker: React.FC<DatePickerProps> = ({ id, label, validation, error, c
   );
 
   return (
-    <>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <Controller
-        name={id}
-        control={control}
-        rules={validation}
-        render={({ field: { onChange, value } }) => (
-          <ReactDatePicker
-            selected={value}
-            onChange={onChange}
-            showTimeSelect={true}
-            dateFormat="Pp"
-            timeIntervals={5}
-            showTimeInput={true}
-            minDate={new Date()}
-            placeholderText="Pick a time..."
-            showPopperArrow={false}
-            isClearable={true}
-            className={classes}
-          />
-        )}
-      />
-    </>
+    <Controller
+      name={id}
+      control={control}
+      rules={validation}
+      render={({ field: { onChange, value } }) => (
+        <ReactDatePicker
+          selected={value}
+          onChange={onChange}
+          showTimeSelect={true}
+          dateFormat="Pp"
+          timeIntervals={5}
+          showTimeInput={true}
+          minDate={new Date()}
+          placeholderText="Pick a time..."
+          showPopperArrow={false}
+          isClearable={true}
+          className={classes}
+        />
+      )}
+    />
   );
 };
 

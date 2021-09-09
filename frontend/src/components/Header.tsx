@@ -1,7 +1,11 @@
 import classNames from 'classnames';
 import React from 'react';
 import { BiMenu, BiX } from 'react-icons/bi';
+import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { getUserMyself } from 'src/api';
+import { useStore } from 'src/store';
+import { UserDetails } from 'src/types/UserTypes';
 
 const links = [
   {
@@ -11,10 +15,6 @@ const links = [
   {
     name: 'Create Event',
     link: '/event/create',
-  },
-  {
-    name: 'About',
-    link: '/',
   },
 ];
 
@@ -31,6 +31,24 @@ const authLinks = [
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+
+  const { firstName } = useStore((state) => state.userDetails);
+  const setUserDetails = useStore((state) => state.setUserDetails);
+  const setUserAuthenticated = useStore((state) => state.setUserAuthenticated);
+
+  useQuery('userMyself', getUserMyself, {
+    onSuccess: (data: UserDetails) => {
+      setUserDetails({ ...data });
+      setUserAuthenticated(true);
+    },
+    onError: () => {
+      setUserDetails({ id: '', email: '', firstName: '', lastName: '' });
+      setUserAuthenticated(false);
+    },
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
   const toggle = () => setIsOpen(!isOpen);
 
   const LogoContainer: React.FC = () => (
@@ -72,11 +90,22 @@ const Header: React.FC = () => {
         </div>
         <hr className={hrClasses} />
         <div className={linkClasses}>
-          {authLinks.map((item, key) => (
-            <Link className="flex py-2.5 h-full lg:px-4" to={item.link} key={key}>
-              {item.name}
-            </Link>
-          ))}
+          {!firstName &&
+            authLinks.map((item, key) => (
+              <Link className="flex py-2.5 h-full lg:px-4" to={item.link} key={key}>
+                {item.name}
+              </Link>
+            ))}
+          {firstName && (
+            <>
+              <Link className="flex py-2.5 h-full lg:px-4" to="/profile">
+                My Profile
+              </Link>
+              <Link className="flex py-2.5 h-full lg:px-4" to="/logout">
+                Log Out
+              </Link>
+            </>
+          )}
         </div>
       </>
     );

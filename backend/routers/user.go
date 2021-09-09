@@ -8,11 +8,17 @@ import (
 
 func SetUserRoutes(router *gin.RouterGroup) {
 	userGroup := router.Group("/user")
-	userGroup.GET("/:id", controllers.GetUser)
+	userGroup.GET("/:id", middleware.CheckSessionToken, controllers.GetUser)
 	userGroup.GET(
 		"/me",
 		middleware.CheckSessionToken,
 		middleware.AuthRequired,
 		controllers.GetUserMyself,
+	)
+	userGroup.PUT(
+		"/me",
+		middleware.CheckSessionToken,
+		middleware.AuthRequired,
+		controllers.UpdateUserMyself,
 	)
 }
