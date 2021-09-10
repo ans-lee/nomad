@@ -23,23 +23,23 @@ type EditEventSchema struct {
 }
 
 type GetEventSchema struct {
-	ID 			string `json:"id"`
-	Title       string `json:"title"`
-	Location    string `json:"location"`
+	ID          string  `json:"id"`
+	Title       string  `json:"title"`
+	Location    string  `json:"location"`
 	Lat         float64 `json:"lat"`
 	Lng         float64 `json:"lng"`
-	Online      bool   `json:"online"`
-	Description string `json:"description"`
-	Category    string `json:"category"`
-	Start       string `json:"start"`
-	End         string `json:"end"`
-	Visibility  string `json:"visibility"`
+	Online      bool    `json:"online"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+	Start       string  `json:"start"`
+	End         string  `json:"end"`
+	Visibility  string  `json:"visibility"`
 }
 
 type EventCoordsSchema struct {
-	ID 			string  `json:"id"`
-	Title       string  `json:"title"`
-	Category    string  `json:"category"`
-	Lat         float64 `json:"lat"`
-	Lng         float64 `json:"lng"`
+	ID       string  `json:"id"`
+	Title    string  `json:"title"`
+	Category string  `json:"category"`
+	Lat      float64 `json:"lat"`
+	Lng      float64 `json:"lng"`
 }

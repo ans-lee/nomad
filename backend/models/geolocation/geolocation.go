@@ -1,4 +1,4 @@
-package geolocation 
+package geolocation
 
 type Coords struct {
 	Lat float64

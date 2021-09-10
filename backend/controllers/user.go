@@ -116,8 +116,8 @@ func UpdateUserMyself(c *gin.Context) {
 		)
 
 	c.JSON(http.StatusOK, gin.H{
-		"email": data.Email,
+		"email":     data.Email,
 		"firstName": data.FirstName,
-		"lastName": data.LastName,
+		"lastName":  data.LastName,
 	})
 }

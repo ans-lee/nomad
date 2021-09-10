@@ -36,7 +36,7 @@ func GetBounds(neStr, swStr string) (geolocation.Bounds, error) {
 
 func WithinBounds(bounds geolocation.Bounds, coords geolocation.Coords) bool {
 	// If all bounds are 0
-	if bounds.NeLat + bounds.NeLng + bounds.SwLat + bounds.SwLng == 0 {
+	if bounds.NeLat+bounds.NeLng+bounds.SwLat+bounds.SwLng == 0 {
 		return true
 	}
 

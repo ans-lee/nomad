@@ -271,17 +271,15 @@ func GetAllEvents(c *gin.Context) {
 	events := make([]serializers.GetEventSchema, 0)
 	for _, result := range results {
 		event := serializers.GetEventSchema{
-			ID: result["_id"].(primitive.ObjectID).Hex(),
-			Title: result["title"].(string),
-			Online: result["online"].(bool),
+			ID:       result["_id"].(primitive.ObjectID).Hex(),
+			Title:    result["title"].(string),
+			Online:   result["online"].(bool),
 			Category: result["category"].(string),
-			Start: result["start"].
-				(primitive.DateTime).
+			Start: result["start"].(primitive.DateTime).
 				Time().
 				UTC().
 				Format(time.RFC3339),
-			End: result["end"].
-				(primitive.DateTime).
+			End: result["end"].(primitive.DateTime).
 				Time().
 				UTC().
 				Format(time.RFC3339),
@@ -301,7 +299,7 @@ func GetAllEvents(c *gin.Context) {
 				})
 			}
 
-			if (len(coords) > 0) {
+			if len(coords) > 0 {
 				event.Lat = coords[0].Geometry.Location.Lat
 				event.Lng = coords[0].Geometry.Location.Lng
 				eventCoords := geolocation.Coords{
@@ -417,17 +415,15 @@ func GetUserCreatedEvents(c *gin.Context) {
 	events := make([]serializers.GetEventSchema, 0)
 	for _, result := range results {
 		event := serializers.GetEventSchema{
-			ID: result["_id"].(primitive.ObjectID).Hex(),
-			Title: result["title"].(string),
-			Online: result["online"].(bool),
+			ID:       result["_id"].(primitive.ObjectID).Hex(),
+			Title:    result["title"].(string),
+			Online:   result["online"].(bool),
 			Category: result["category"].(string),
-			Start: result["start"].
-				(primitive.DateTime).
+			Start: result["start"].(primitive.DateTime).
 				Time().
 				UTC().
 				Format(time.RFC3339),
-			End: result["end"].
-				(primitive.DateTime).
+			End: result["end"].(primitive.DateTime).
 				Time().
 				UTC().
 				Format(time.RFC3339),

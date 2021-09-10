@@ -52,7 +52,7 @@ func main() {
 	setupRoutes(api)
 
 	server := &http.Server{
-		Addr: ":5000",
+		Addr:    ":5000",
 		Handler: router,
 	}
 
@@ -69,7 +69,7 @@ func main() {
 	<-quit
 	log.Println("Shutting down the server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
