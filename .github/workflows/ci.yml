@@ -4,9 +4,6 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -30,5 +27,6 @@ jobs:
       
       - name: Build backend
         run: |
-          cd backend
+          pushd backend
           go build
+          popd
