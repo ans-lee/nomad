@@ -221,9 +221,9 @@ func GetEvent(c *gin.Context) {
 }
 
 func GetAllEvents(c *gin.Context) {
-	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
 	var err error
 
+	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
 	ne, neExist := c.GetQuery("ne")
 	sw, swExist := c.GetQuery("sw")
 
@@ -269,6 +269,7 @@ func GetAllEvents(c *gin.Context) {
 	hasLocation := c.Query("hasLocation")
 
 	events := make([]serializers.GetEventSchema, 0)
+
 	for _, result := range results {
 		event := serializers.GetEventSchema{
 			ID:       result["_id"].(primitive.ObjectID).Hex(),
@@ -287,7 +288,8 @@ func GetAllEvents(c *gin.Context) {
 		}
 
 		if val, exist := result["location"]; exist {
-			event.Location = val.(string)
+			event.Location, _ = val.(string)
+
 			req := &maps.GeocodingRequest{
 				Address: result["location"].(string),
 			}
@@ -316,7 +318,7 @@ func GetAllEvents(c *gin.Context) {
 		}
 
 		if !utils.FilteredEvent(
-			event,
+			&event,
 			hideOnline == "true",
 			hasLocation == "true",
 			category,
@@ -327,7 +329,7 @@ func GetAllEvents(c *gin.Context) {
 		}
 
 		if val, exist := result["description"]; exist {
-			event.Description = val.(string)
+			event.Description, _ = val.(string)
 		}
 
 		events = append(events, event)
@@ -413,6 +415,7 @@ func GetUserCreatedEvents(c *gin.Context) {
 	}
 
 	events := make([]serializers.GetEventSchema, 0)
+
 	for _, result := range results {
 		event := serializers.GetEventSchema{
 			ID:       result["_id"].(primitive.ObjectID).Hex(),
@@ -435,11 +438,11 @@ func GetUserCreatedEvents(c *gin.Context) {
 		}
 
 		if val, exist := result["location"]; exist {
-			event.Location = val.(string)
+			event.Location, _ = val.(string)
 		}
 
 		if val, exist := result["description"]; exist {
-			event.Description = val.(string)
+			event.Description, _ = val.(string)
 		}
 
 		events = append(events, event)

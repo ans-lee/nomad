@@ -48,7 +48,7 @@ func GetStartEndTimes(startStr, endStr string) (start, end time.Time, errStr str
 }
 
 func FilteredEvent(
-	event serializers.GetEventSchema,
+	event *serializers.GetEventSchema,
 	hideOnline, hasLocation bool,
 	category, title string,
 	endTime time.Time,
@@ -64,5 +64,6 @@ func FilteredEvent(
 	} else if time.Now().After(endTime) {
 		return false
 	}
+
 	return true
 }

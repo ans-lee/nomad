@@ -21,6 +21,8 @@ import (
 	"gopkg.in/validator.v2"
 )
 
+const timeout = 5 * time.Second
+
 func main() {
 	// Load .env
 	err := godotenv.Load()
@@ -65,21 +67,22 @@ func main() {
 	// Listen for signals
 	quit := make(chan os.Signal)
 
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM) // nolint:govet, staticcheck
 	<-quit
 	log.Println("Shutting down the server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server force shutdown: ", err)
+	err = server.Shutdown(ctx)
+	if err != nil {
+		log.Printf("Server force shutdown: %s\n", err)
 	}
 
 	// Disconnect MongoDB
 	err = db.GetDatabase().Client().Disconnect(context.Background())
 	if err != nil {
-		log.Fatal("Could not disconnect MongoDB client: ", err)
+		log.Printf("Could not disconnect MongoDB client: %s\n", err)
 	}
 
 	log.Println("Disconnected MongoDB client")
