@@ -64,7 +64,6 @@ func GetUserMyself(c *gin.Context) {
 	})
 }
 
-// TODO check that email already exists or not
 func UpdateUserMyself(c *gin.Context) {
 	var data serializers.UpdateUserSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
@@ -83,6 +82,21 @@ func UpdateUserMyself(c *gin.Context) {
 	if result.Err() != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": ResponseConstants.InvalidUserIDMessage,
+		})
+
+		return
+	}
+
+	var existingUser UserModel.User
+
+	emailFilter := bson.M{"email": data.Email}
+
+	err := db.GetCollection(UserModel.CollectionName).
+		FindOne(context.Background(), emailFilter).
+		Decode(&existingUser)
+	if err == nil && existingUser.ID != userID {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "A user with this email already exists.",
 		})
 
 		return
