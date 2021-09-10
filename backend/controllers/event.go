@@ -3,8 +3,6 @@ package controllers
 import (
 	"context"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
 	AuthConstants "github.com/anslee/nomad/constants/auth"
@@ -15,6 +13,7 @@ import (
 	"github.com/anslee/nomad/models/geolocation"
 	"github.com/anslee/nomad/serializers"
 	"github.com/anslee/nomad/service/gmap"
+	"github.com/anslee/nomad/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -32,7 +31,7 @@ func CreateEvent(c *gin.Context) {
 		return
 	}
 
-	start, end, errStr := getStartEndTimes(data.Start, data.End)
+	start, end, errStr := utils.GetStartEndTimes(data.Start, data.End)
 	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": errStr,
@@ -79,7 +78,7 @@ func EditEvent(c *gin.Context) {
 		return
 	}
 
-	start, end, errStr := getStartEndTimes(data.Start, data.End)
+	start, end, errStr := utils.GetStartEndTimes(data.Start, data.End)
 	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": errStr,
@@ -150,6 +149,47 @@ func EditEvent(c *gin.Context) {
 	})
 }
 
+func DeleteEvent(c *gin.Context) {
+	var event EventModel.Event
+
+	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	filter := bson.M{"_id": eventID}
+
+	err := db.GetCollection(EventModel.CollectionName).
+		FindOne(context.Background(), filter).
+		Decode(&event)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	if userID.(primitive.ObjectID) != event.CreatedBy {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not have permission to delete this event.",
+		})
+
+		return
+	}
+
+	result, err := db.GetCollection(EventModel.CollectionName).
+		DeleteOne(context.Background(), filter)
+	if err != nil || result.DeletedCount != 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": ResponseConstants.InvalidEventIDMessage,
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Event deleted!",
+	})
+}
+
 func GetEvent(c *gin.Context) {
 	var event EventModel.Event
 
@@ -195,7 +235,7 @@ func GetAllEvents(c *gin.Context) {
 		return
 	}
 
-	newBounds, err := getBounds(ne, sw)
+	newBounds, err := utils.GetBounds(ne, sw)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": ResponseConstants.InternalServerErrorMessage,
@@ -204,17 +244,11 @@ func GetAllEvents(c *gin.Context) {
 		return
 	}
 
-	category := c.Query("category")
-	title := c.Query("title")
-	hideOnline := c.Query("hideOnline")
-	hasLocation := c.Query("hasLocation")
-
 	cursor, err := db.GetCollection(EventModel.CollectionName).
 		Find(context.Background(), filter)
-	// TODO check whether no events returns error or not
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": ResponseConstants.InvalidEventIDMessage,
+			"error": ResponseConstants.InternalServerErrorMessage,
 		})
 
 		return
@@ -228,6 +262,11 @@ func GetAllEvents(c *gin.Context) {
 
 		return
 	}
+
+	category := c.Query("category")
+	title := c.Query("title")
+	hideOnline := c.Query("hideOnline")
+	hasLocation := c.Query("hasLocation")
 
 	events := make([]serializers.GetEventSchema, 0)
 	for _, result := range results {
@@ -270,7 +309,7 @@ func GetAllEvents(c *gin.Context) {
 					Lng: event.Lng,
 				}
 
-				if !withinBounds(newBounds, eventCoords) {
+				if !utils.WithinBounds(newBounds, eventCoords) {
 					continue
 				}
 			} else {
@@ -278,16 +317,14 @@ func GetAllEvents(c *gin.Context) {
 			}
 		}
 
-		// Filtering
-		if hideOnline == "true" && event.Online {
-			continue
-		} else if hasLocation == "true" && event.Location == "" {
-			continue
-		} else if category != "" && category != EventConstants.CategoryNone && category != event.Category {
-			continue
-		} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
-			continue
-		} else if time.Now().After(result["end"].(primitive.DateTime).Time()) {
+		if !utils.FilteredEvent(
+			event,
+			hideOnline == "true",
+			hasLocation == "true",
+			category,
+			title,
+			result["end"].(primitive.DateTime).Time(),
+		) {
 			continue
 		}
 
@@ -360,7 +397,6 @@ func GetUserCreatedEvents(c *gin.Context) {
 
 	cursor, err := db.GetCollection(EventModel.CollectionName).
 		Find(context.Background(), filter)
-	// TODO check whether no events returns error or not
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": ResponseConstants.InvalidEventIDMessage,
@@ -416,122 +452,4 @@ func GetUserCreatedEvents(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"events": events,
 	})
-}
-
-func DeleteEvent(c *gin.Context) {
-	var event EventModel.Event
-
-	eventID, _ := primitive.ObjectIDFromHex(c.Param("id"))
-	filter := bson.M{"_id": eventID}
-
-	err := db.GetCollection(EventModel.CollectionName).
-		FindOne(context.Background(), filter).
-		Decode(&event)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": ResponseConstants.InvalidEventIDMessage,
-		})
-
-		return
-	}
-
-	userID, _ := c.Get(AuthConstants.ContextAuthKey)
-	if userID.(primitive.ObjectID) != event.CreatedBy {
-		c.JSON(http.StatusForbidden, gin.H{
-			"error": "You do not have permission to delete this event.",
-		})
-
-		return
-	}
-
-	result, err := db.GetCollection(EventModel.CollectionName).
-		DeleteOne(context.Background(), filter)
-	if err != nil || result.DeletedCount != 1 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": ResponseConstants.InvalidEventIDMessage,
-		})
-
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Event deleted!",
-	})
-}
-
-func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr string) {
-	start, err := time.Parse(time.RFC3339, startStr)
-	if err != nil {
-		return start, start, "Start time must be in RFC3339 format."
-	}
-
-	end, err = time.Parse(time.RFC3339, endStr)
-	if err != nil {
-		return start, end, "End time must be in RFC3339 format."
-	}
-
-	if start.After(end) {
-		return start, end, "Start time cannot be after the end time."
-	}
-
-	start = time.Date(
-		start.Year(),
-		start.Month(),
-		start.Day(),
-		start.Hour(),
-		start.Minute(),
-		0,
-		0,
-		start.Location(),
-	)
-	end = time.Date(
-		end.Year(),
-		end.Month(),
-		end.Day(),
-		end.Hour(),
-		end.Minute(),
-		0,
-		0,
-		end.Location(),
-	)
-
-	return start, end, ""
-}
-
-func getBounds(neStr, swStr string) (geolocation.Bounds, error) {
-	newBounds := geolocation.Bounds{}
-	var err error
-
-	newBounds.NeLat, err = strconv.ParseFloat(strings.Split(neStr, ",")[0], 64)
-	if err != nil {
-		return newBounds, err
-	}
-
-	newBounds.NeLng, err = strconv.ParseFloat(strings.Split(neStr, ",")[1], 64)
-	if err != nil {
-		return newBounds, err
-	}
-
-	newBounds.SwLat, err = strconv.ParseFloat(strings.Split(swStr, ",")[0], 64)
-	if err != nil {
-		return newBounds, err
-	}
-
-	newBounds.SwLng, err = strconv.ParseFloat(strings.Split(swStr, ",")[1], 64)
-	if err != nil {
-		return newBounds, err
-	}
-	
-	return newBounds, nil
-}
-
-func withinBounds(bounds geolocation.Bounds, coords geolocation.Coords) bool {
-	// If all bounds are 0
-	if bounds.NeLat + bounds.NeLng + bounds.SwLat + bounds.SwLng == 0 {
-		return true
-	}
-
-	withinX := coords.Lng > bounds.SwLng && coords.Lng < bounds.NeLng
-	withinY := coords.Lat > bounds.SwLat && coords.Lat < bounds.NeLat
-	return withinX && withinY
 }

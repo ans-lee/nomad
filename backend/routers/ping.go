@@ -6,13 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetPongRoutes(router *gin.RouterGroup) {
-	pongGroup := router.Group("/pong")
-	pongGroup.GET("/", controllers.Pong)
+func SetPingRoutes(router *gin.RouterGroup) {
+	pongGroup := router.Group("/ping")
+	pongGroup.GET("/", controllers.Ping)
 	pongGroup.GET(
 		"/auth",
 		middleware.CheckSessionToken,
 		middleware.AuthRequired,
-		controllers.Pong,
+		controllers.Ping,
 	)
 }
