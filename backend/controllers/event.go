@@ -12,6 +12,7 @@ import (
 	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
+	"github.com/anslee/nomad/models/geolocation"
 	"github.com/anslee/nomad/serializers"
 	"github.com/anslee/nomad/service/gmap"
 	"github.com/gin-gonic/gin"
@@ -68,7 +69,6 @@ func CreateEvent(c *gin.Context) {
 	})
 }
 
-//TODO check whether user was the person who created the event
 func EditEvent(c *gin.Context) {
 	var data serializers.EditEventSchema
 	if c.ShouldBindJSON(&data) != nil || validator.Validate(data) != nil {
@@ -182,50 +182,26 @@ func GetEvent(c *gin.Context) {
 
 func GetAllEvents(c *gin.Context) {
 	filter := bson.M{"visibility": EventConstants.VisibilityPublic}
-	var neLat float64
-	var neLng float64
-	var swLat float64
-	var swLng float64
 	var err error
 
-	if ne, exist := c.GetQuery("ne"); exist {
-		neLat, err = strconv.ParseFloat(strings.Split(ne, ",")[0], 64)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": ResponseConstants.InternalServerErrorMessage,
-			})
+	ne, neExist := c.GetQuery("ne")
+	sw, swExist := c.GetQuery("sw")
 
-			return
-		}
+	if !neExist || !swExist {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Coordinates are missing in the query strings",
+		})
 
-		neLng, err = strconv.ParseFloat(strings.Split(ne, ",")[1], 64)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": ResponseConstants.InternalServerErrorMessage,
-			})
-
-			return
-		}
+		return
 	}
 
-	if sw, exist := c.GetQuery("sw"); exist {
-		swLat, err = strconv.ParseFloat(strings.Split(sw, ",")[0], 64)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": ResponseConstants.InternalServerErrorMessage,
-			})
+	newBounds, err := getBounds(ne, sw)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": ResponseConstants.InternalServerErrorMessage,
+		})
 
-			return
-		}
-
-		swLng, err = strconv.ParseFloat(strings.Split(sw, ",")[1], 64)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": ResponseConstants.InternalServerErrorMessage,
-			})
-
-			return
-		}
+		return
 	}
 
 	category := c.Query("category")
@@ -289,8 +265,12 @@ func GetAllEvents(c *gin.Context) {
 			if (len(coords) > 0) {
 				event.Lat = coords[0].Geometry.Location.Lat
 				event.Lng = coords[0].Geometry.Location.Lng
+				eventCoords := geolocation.Coords{
+					Lat: event.Lat,
+					Lng: event.Lng,
+				}
 
-				if !withinBounds(swLng, swLat, neLng, neLat, event.Lng, event.Lat) {
+				if !withinBounds(newBounds, eventCoords) {
 					continue
 				}
 			} else {
@@ -518,13 +498,40 @@ func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr str
 	return start, end, ""
 }
 
-func withinBounds(x1, y1, x2, y2, pointX, pointY float64) bool {
+func getBounds(neStr, swStr string) (geolocation.Bounds, error) {
+	newBounds := geolocation.Bounds{}
+	var err error
+
+	newBounds.NeLat, err = strconv.ParseFloat(strings.Split(neStr, ",")[0], 64)
+	if err != nil {
+		return newBounds, err
+	}
+
+	newBounds.NeLng, err = strconv.ParseFloat(strings.Split(neStr, ",")[1], 64)
+	if err != nil {
+		return newBounds, err
+	}
+
+	newBounds.SwLat, err = strconv.ParseFloat(strings.Split(swStr, ",")[0], 64)
+	if err != nil {
+		return newBounds, err
+	}
+
+	newBounds.SwLng, err = strconv.ParseFloat(strings.Split(swStr, ",")[1], 64)
+	if err != nil {
+		return newBounds, err
+	}
+	
+	return newBounds, nil
+}
+
+func withinBounds(bounds geolocation.Bounds, coords geolocation.Coords) bool {
 	// If all bounds are 0
-	if (x1 + y1 + x2 + y2 == 0) {
+	if bounds.NeLat + bounds.NeLng + bounds.SwLat + bounds.SwLng == 0 {
 		return true
 	}
 
-	withinX := pointX > x1 && pointX < x2
-	withinY := pointY > y1 && pointY < y2
+	withinX := coords.Lng > bounds.SwLng && coords.Lng < bounds.NeLng
+	withinY := coords.Lat > bounds.SwLat && coords.Lat < bounds.NeLat
 	return withinX && withinY
 }
