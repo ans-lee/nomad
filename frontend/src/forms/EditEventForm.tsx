@@ -58,8 +58,8 @@ const EditEventForm: React.FC = () => {
     {
       onSuccess: () => history.push(`/event/${id}`),
       onError: (err: FetchError) => {
-        if (err.res.status === 401) {
-          setErrMsg('You are not authorized to make an event');
+        if (err.res.status === 403) {
+          setErrMsg('You do not have permission to edit this event');
         } else {
           setErrMsg('Something went wrong! Please try again');
         }

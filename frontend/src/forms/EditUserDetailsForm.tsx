@@ -31,8 +31,8 @@ const EditUserDetailsForm: React.FC = () => {
     {
       onSuccess: (data: UserDetails) => setUserDetails({ ...data }),
       onError: (err: FetchError) => {
-        if (err.res.status === 401) {
-          setErrMsg('You are not authorized to make an event');
+        if (err.res.status === 400) {
+          setErrMsg('The new email you have entered is already registered');
         } else {
           setErrMsg('Something went wrong! Please try again');
         }

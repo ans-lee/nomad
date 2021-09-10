@@ -46,7 +46,7 @@ const CreateEventForm: React.FC = () => {
       onSuccess: () => history.push('/profile'),
       onError: (err: FetchError) => {
         if (err.res.status === 401) {
-          setErrMsg('You are not authorized to make an event');
+          setErrMsg('You must be logged in to create an event');
         } else {
           setErrMsg('Something went wrong! Please try again');
         }
