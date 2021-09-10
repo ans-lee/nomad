@@ -12,10 +12,8 @@ import (
 	ResponseConstants "github.com/anslee/nomad/constants/response"
 	"github.com/anslee/nomad/db"
 	EventModel "github.com/anslee/nomad/models/event"
-	GroupModel "github.com/anslee/nomad/models/group"
 	"github.com/anslee/nomad/serializers"
 	"github.com/anslee/nomad/service/gmap"
-	"github.com/anslee/nomad/utils"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -53,32 +51,6 @@ func CreateEvent(c *gin.Context) {
 		End:         primitive.NewDateTimeFromTime(end.UTC()),
 		Visibility:  data.Visibility,
 		CreatedBy:   userID.(primitive.ObjectID),
-	}
-
-	if data.GroupID != "" {
-		groupID, groupErr := getGroupID(data.GroupID)
-		if groupErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": ResponseConstants.InvalidGroupIDMessage,
-			})
-
-			return
-		}
-
-		if !utils.UserInGroup(userID.(primitive.ObjectID), groupID) {
-			c.JSON(http.StatusForbidden, gin.H{
-				"error": "You do not have permission to create an event on this group.",
-			})
-
-			return
-		}
-
-		if data.Visibility == EventConstants.VisibilityPublic && !groupIsPublic(groupID) {
-			// Event is private if group is private
-			newEvent.Visibility = EventConstants.VisibilityPrivate
-		}
-
-		newEvent.GroupID = groupID
 	}
 
 	result, err := db.GetCollection(EventModel.CollectionName).
@@ -132,24 +104,13 @@ func EditEvent(c *gin.Context) {
 		return
 	}
 
-	if !event.GroupID.IsZero() {
-		userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	userID, _ := c.Get(AuthConstants.ContextAuthKey)
+	if event.CreatedBy != userID.(primitive.ObjectID) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "You do not have permission to edit the event.",
+		})
 
-		if !utils.UserInGroup(userID.(primitive.ObjectID), event.GroupID) {
-			c.JSON(http.StatusForbidden, gin.H{
-				"error": "You do not have permission to edit the event.",
-			})
-
-			return
-		}
-
-		if !groupIsPublic(event.GroupID) && data.Visibility != EventConstants.VisibilityPrivate {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Event can only be private if the group is private.",
-			})
-
-			return
-		}
+		return
 	}
 
 	updateFields := bson.D{
@@ -206,23 +167,6 @@ func GetEvent(c *gin.Context) {
 		return
 	}
 
-	if event.Visibility == EventConstants.VisibilityPrivate {
-		userID, exists := c.Get(AuthConstants.ContextAuthKey)
-
-		if !exists || !userCanAccessEvent(userID.(primitive.ObjectID), event.GroupID) {
-			c.JSON(http.StatusForbidden, gin.H{
-				"error": "You do not have permission to view this event.",
-			})
-
-			return
-		}
-	}
-
-	groupIDStr := ""
-	if !event.GroupID.IsZero() {
-		groupIDStr = event.GroupID.Hex()
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"title":       event.Title,
 		"location":    event.Location,
@@ -233,7 +177,6 @@ func GetEvent(c *gin.Context) {
 		"end":         event.End.Time().UTC(),
 		"visibility":  event.Visibility,
 		"createdBy":   event.CreatedBy.Hex(),
-		"groupID":     groupIDStr,
 	})
 }
 
@@ -372,10 +315,6 @@ func GetAllEvents(c *gin.Context) {
 			event.Description = val.(string)
 		}
 
-		if val, exist := result["groupID"]; exist {
-			event.GroupID = val.(primitive.ObjectID).Hex()
-		}
-
 		events = append(events, event)
 	}
 
@@ -491,10 +430,6 @@ func GetUserCreatedEvents(c *gin.Context) {
 			event.Description = val.(string)
 		}
 
-		if val, exist := result["groupID"]; exist {
-			event.GroupID = val.(primitive.ObjectID).Hex()
-		}
-
 		events = append(events, event)
 	}
 
@@ -581,53 +516,6 @@ func getStartEndTimes(startStr, endStr string) (start, end time.Time, errStr str
 	)
 
 	return start, end, ""
-}
-
-func getGroupID(idStr string) (primitive.ObjectID, error) {
-	groupID, err := primitive.ObjectIDFromHex(idStr)
-	if err != nil {
-		return groupID, err
-	}
-
-	var group GroupModel.Group
-
-	filter := bson.M{"_id": groupID}
-
-	err = db.GetCollection(GroupModel.CollectionName).
-		FindOne(context.Background(), filter).
-		Decode(&group)
-	if err != nil {
-		return groupID, err
-	}
-
-	return groupID, nil
-}
-
-func groupIsPublic(groupID primitive.ObjectID) bool {
-	var group GroupModel.Group
-
-	filter := bson.M{"_id": groupID}
-
-	err := db.GetCollection(GroupModel.CollectionName).
-		FindOne(context.Background(), filter).
-		Decode(&group)
-	if err != nil {
-		return false
-	}
-
-	return group.IsPublic
-}
-
-func userCanAccessEvent(userID, groupID primitive.ObjectID) bool {
-	if groupID.IsZero() {
-		return true
-	}
-
-	if !utils.UserInGroup(userID, groupID) {
-		return false
-	}
-
-	return true
 }
 
 func withinBounds(x1, y1, x2, y2, pointX, pointY float64) bool {

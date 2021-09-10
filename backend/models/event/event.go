@@ -14,6 +14,5 @@ type Event struct {
 	Start       primitive.DateTime `bson:"start"`
 	End         primitive.DateTime `bson:"end"`
 	Visibility  string             `bson:"visibility"`
-	GroupID     primitive.ObjectID `bson:"groupID,omitempty"`
 	CreatedBy   primitive.ObjectID `bson:"createdBy"`
 }

@@ -9,7 +9,6 @@ type CreateEventSchema struct {
 	Start       string `json:"start" binding:"required"`
 	End         string `json:"end" binding:"required"`
 	Visibility  string `json:"visibility" binding:"required" validate:"regexp=^(public|private)$"` // nolint:lll
-	GroupID     string `json:"groupID" validate:"min=0,max=24"`
 }
 
 type EditEventSchema struct {
@@ -35,7 +34,6 @@ type GetEventSchema struct {
 	Start       string `json:"start"`
 	End         string `json:"end"`
 	Visibility  string `json:"visibility"`
-	GroupID     string `json:"groupID"`
 }
 
 type EventCoordsSchema struct {

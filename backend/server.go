@@ -87,8 +87,6 @@ func main() {
 }
 
 func setupRoutes(router *gin.RouterGroup) {
-	// Disable Group routes for now
-	// routers.SetGroupRoutes(router) // nolint:gocritic
 	routers.SetPongRoutes(router)
 	routers.SetUserRoutes(router)
 	routers.SetAuthRoutes(router)
