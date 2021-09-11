@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LoginForm from 'src/forms/LoginForm';
+import logoImg from 'src/assets/logo/logo.png';
 
 const LoginPage: React.FC = () => (
-  <div className="h-screen w-screen m-auto flex flex-col justify-center sm:w-96">
+  <div className="h-screen w-screen m-auto flex flex-col items-center justify-center sm:w-96">
+    <img className="w-40 h-auto mb-2" src={logoImg} />
     <div className="h-screen rounded-md border border-gray-300 p-4 bg-white sm:h-auto">
       <h1 className="text-4xl text-center mb-4">Login</h1>
       <LoginForm />

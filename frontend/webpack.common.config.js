@@ -60,6 +60,7 @@ module.exports = {
     new webpack.EnvironmentPlugin(['GOOGLE_API_KEY']),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'index.html'),
+      favicon: path.join(__dirname, 'src/assets/favicon/favicon.ico'),
     }),
     new ForkTsCheckerWebpackPlugin({
       async: false,
