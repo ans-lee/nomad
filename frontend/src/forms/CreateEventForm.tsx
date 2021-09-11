@@ -114,7 +114,7 @@ const CreateEventForm: React.FC = () => {
         <div className="text-sm text-red-500 -mt-2 mb-2">End time must be the same or after the start time</div>
       )}
 
-      <Label id="isPrivate" text="Private" />
+      <Label id="isPrivate" text="Private (only users with the link can view it)" />
       <ToggleSwitch id="isPrivate" enabled={isPrivate} register={register} />
 
       <button type="submit" className="w-full bg-primary rounded-md text-white px-3.5 py-2 mt-4 disabled:opacity-50">

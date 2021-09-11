@@ -96,7 +96,7 @@ func LogIn(c *gin.Context) {
 	token := utils.CreateSessionToken(AuthConstants.SessionTokenLength)
 	session := SessionModel.Session{
 		Token:  token,
-		Expiry: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 1, 0).UTC()),
+		Expiry: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, 7).UTC()),
 		User:   user.ID,
 	}
 

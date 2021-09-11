@@ -10,7 +10,7 @@ import logoImg from 'src/assets/logo/logo.png';
 
 const links = [
   {
-    name: 'Find Event',
+    name: 'Find Events',
     link: '/event/search',
   },
   {
