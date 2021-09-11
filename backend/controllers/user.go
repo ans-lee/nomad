@@ -95,8 +95,8 @@ func UpdateUserMyself(c *gin.Context) {
 		FindOne(context.Background(), emailFilter).
 		Decode(&existingUser)
 	if err == nil && existingUser.ID != userID {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "A user with this email already exists.",
+		c.JSON(http.StatusConflict, gin.H{
+			"error": ResponseConstants.UserEmailExists,
 		})
 
 		return

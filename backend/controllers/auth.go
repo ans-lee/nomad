@@ -30,7 +30,7 @@ func SignUp(c *gin.Context) {
 
 	if userExists(data.Email) {
 		c.JSON(http.StatusConflict, gin.H{
-			"error": "A user with this email already exists.",
+			"error": ResponseConstants.UserEmailExists,
 		})
 
 		return

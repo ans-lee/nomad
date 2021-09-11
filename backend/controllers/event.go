@@ -287,6 +287,8 @@ func GetAllEvents(c *gin.Context) {
 			Visibility: result["visibility"].(string),
 		}
 
+		// Find coordinates of the location if the event has one and check if
+		// its within the bounds
 		if val, exist := result["location"]; exist {
 			event.Location, _ = val.(string)
 
