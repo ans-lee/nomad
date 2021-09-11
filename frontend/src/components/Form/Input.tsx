@@ -15,7 +15,7 @@ const Input: React.FC<InputProps> = ({ id, validation, error, register, ...rest 
     'mt-2',
     'mb-4',
     'px-3.5',
-    'py-1',
+    'py-2',
     'outline-none',
     'rounded-md',
     'border',

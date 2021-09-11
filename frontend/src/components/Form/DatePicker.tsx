@@ -17,7 +17,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ id, validation, error, control 
     'mt-2',
     'mb-4',
     'px-3.5',
-    'py-1',
+    'py-2',
     'outline-none',
     'rounded-md',
     'border',

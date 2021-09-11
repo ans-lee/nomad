@@ -34,7 +34,7 @@ const CreateEventForm: React.FC = () => {
     handleSubmit,
     control,
     watch,
-  } = useForm<Inputs>({ defaultValues: { online: true, location: { value: '', label: '' } } });
+  } = useForm<Inputs>({ defaultValues: { location: { value: '', label: '' } } });
   const isOnline = watch('online');
   const startTime = watch('start');
   const isPrivate = watch('isPrivate');
