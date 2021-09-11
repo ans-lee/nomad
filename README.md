@@ -1,11 +1,12 @@
+![Nomad Logo](frontend/src/assets/logo/logo.png)
+
 # Nomad
 
 Visit the website: https://nomadexplore.xyz
 
-Nomad is a webapp that provides users an interface to find events upcoming, either in person
+Nomad is a webapp that provides users with an interface to find events upcoming, either in person
 or online as well as allowing users to create events for others to participate. This features
-a map displaying upcoming events in similar fashion to how you can find places to rent on
-AirBnb.
+a map displaying upcoming events in a similar fashion to finding places to rent on Airbnb.
 
 ## Features
 
@@ -20,7 +21,7 @@ AirBnb.
 
 ## Using the website
 
-Simply visit the website [here](https://nomadexplore.xyz) to click on "Find Events" on the header to
+Simply visit the website [here](https://nomadexplore.xyz) and click on "Find Events" on the header to
 find upcoming events. You can drag around the map to check other areas for events or use the filters
 to search for specific events or jump to a location on the map. To view all of an event's details, either
 click the marker or click on one of the items on the events list underneath the filters.
@@ -44,3 +45,27 @@ case you made a mistake when signing up.
 
 **NOTE:** For events where their end date and time past, they will no longer show up on the map or in your
 Created Events page. This is not a bug.
+
+## Technology
+
+This project uses React with Typescript for the frontend, and Golang with Gin Gonic Web Framework for
+the backend REST API.
+
+Here's a list of most of the technology used:
+
+- React with Typescript
+- Golang with Gin Gonic Web Framework
+- MongoDB
+- Google Maps API
+- Google Places API
+- Google Geocoding API
+
+## Planned Features
+
+Considering this project's codebase was worked on by just myself, some features had to be cut out in the
+interests of polishing the product to achieve a MVP. Here were some of the features that were planned:
+
+- Images for events
+- Group system, similar to Facebook events
+- End to end and unit testing
+- Using Google Maps to pick an event's location
