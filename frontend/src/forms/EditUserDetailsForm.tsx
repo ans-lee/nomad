@@ -31,7 +31,7 @@ const EditUserDetailsForm: React.FC = () => {
     {
       onSuccess: (data: UserDetails) => setUserDetails({ ...data }),
       onError: (err: FetchError) => {
-        if (err.res.status === 400) {
+        if (err.res.status === 409) {
           setErrMsg('The new email you have entered is already registered');
         } else {
           setErrMsg('Something went wrong! Please try again');
