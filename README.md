@@ -69,3 +69,82 @@ interests of polishing the product to achieve a MVP. Here were some of the featu
 - Group system, similar to Facebook events
 - End to end and unit testing
 - Using Google Maps to pick an event's location
+
+## Running the website
+
+Requirements:
+
+- Ubuntu or other Linux distros except WSL (tested only on Ubuntu 20.04 but should work with other versions and distros)
+- Golang 1.16
+- Node 16.7.0
+- Yarn
+- MongoDB
+
+**NOTE:** Make sure MongoDB is running on the machine. If you can access the MongoDB shell session using this command
+then MongoDB is running:
+
+```
+mongosh
+```
+
+### In Development Mode
+
+1. Change into the `frontend` directory and run the below to install the frontend dependencies
+
+```
+yarn
+```
+
+2. Change into the `backend` directory and run the below to install the backend dependencies
+
+```
+go mod download
+```
+
+3. Run the frontend development server while in the `frontend` directory by running the below
+
+```
+yarn dev
+```
+
+4. Run the backend development server while in the `backend` directory by running the below
+
+```
+bash run_server.sh
+```
+
+5. Visit http://localhost:8080/ to view the website
+
+### In Production Mode
+
+1. Change into the `frontend` directory and run the below to install the frontend dependencies
+
+```
+yarn
+```
+
+2. Change into the `backend` directory and run the below to install the backend dependencies
+
+```
+go mod download
+```
+
+3. Build the frontend by running the command below in the `frontend` directory
+
+```
+yarn build
+```
+
+4. Run the command below to start the frontend server in the `frontend` directory
+
+```
+node server.js
+```
+
+5. Run the backend development server while in the `backend` directory by running the below
+
+```
+bash run_server.sh production
+```
+
+6. Check the IP/domain name of the system that is running the servers
