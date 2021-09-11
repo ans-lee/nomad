@@ -14,7 +14,7 @@ interface MapMarkerProps {
 const MapMarker: React.FC<MapMarkerProps> = ({ id, title, category }) => {
   const markerClasses = classNames(
     'rounded-full',
-    category === CATEGORY_OPTIONS[0].value ? 'bg-none' : '',
+    category === CATEGORY_OPTIONS[0].value ? 'bg-nonecategory' : '',
     category === CATEGORY_OPTIONS[1].value ? 'bg-gallery' : '',
     category === CATEGORY_OPTIONS[2].value ? 'bg-performance' : '',
     category === CATEGORY_OPTIONS[3].value ? 'bg-film' : '',

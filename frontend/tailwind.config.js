@@ -18,7 +18,7 @@ module.exports = {
         secondary: '#9a97ef',
         neutral: '#6b7280',
         danger: '#dc2626',
-        none: '#f3f4f6',
+        nonecategory: '#f3f4f6',
         gallery: '#799dbe',
         performance: '#fbcfe8',
         film: '#fcba6c',

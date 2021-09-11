@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { getUserMyself } from 'src/api';
 import { useStore } from 'src/store';
 import { UserDetails } from 'src/types/UserTypes';
+import logoImg from 'src/assets/logo/logo.png';
 
 const links = [
   {
@@ -52,9 +53,9 @@ const Header: React.FC = () => {
   const toggle = () => setIsOpen(!isOpen);
 
   const LogoContainer: React.FC = () => (
-    <div className="font-bold flex p-0 h-full justify-between lg:px-4 lg:py-2.5">
+    <div className="font-bold flex p-0 h-full justify-between lg:px-4">
       <Link className="flex items-center" to="/">
-        Nomad
+        <img className="h-12" src={logoImg} />
       </Link>
       <MenuToggle />
     </div>
