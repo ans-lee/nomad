@@ -55,13 +55,21 @@ func FilteredEvent(
 ) bool {
 	if hideOnline && event.Online {
 		return false
-	} else if hasLocation && event.Location == "" {
+	}
+
+	if hasLocation && event.Location == "" {
 		return false
-	} else if category != "" && category != EventConstants.CategoryNone && category != event.Category {
+	}
+
+	if category != "" && category != EventConstants.CategoryNone && category != event.Category {
 		return false
-	} else if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
+	}
+
+	if title != "" && !strings.Contains(strings.ToLower(event.Title), strings.ToLower(title)) {
 		return false
-	} else if time.Now().After(endTime) {
+	}
+
+	if time.Now().After(endTime) {
 		return false
 	}
 
