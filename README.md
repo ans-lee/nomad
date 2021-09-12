@@ -43,7 +43,7 @@ when creating an event and click "Edit Event" to save the new details.
 On the page redirected by the "My Profile" button earlier, you can also change your details there in
 case you made a mistake when signing up.
 
-**NOTE:** For events where their end date and time past, they will no longer show up on the map or in your
+**NOTE:** For events where their end date and time has past, they will no longer show up on the map or in your
 Created Events page. This is not a bug.
 
 ## Technology
