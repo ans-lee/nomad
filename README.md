@@ -74,6 +74,7 @@ interests of polishing the product to achieve a MVP. Here were some of the featu
 - Group system, similar to Facebook events
 - End to end and unit testing
 - Using Google Maps to pick an event's location
+- Dark Mode
 
 ## Running the website
 
