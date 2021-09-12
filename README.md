@@ -51,7 +51,7 @@ Created Events page. This is not a bug.
 This project uses React with Typescript for the frontend, and Golang with Gin Gonic Web Framework for
 the backend REST API.
 
-Here's a list of most of the technology used:
+Here's a list of the relevant technology used:
 
 - React with Typescript
 - Golang with Gin Gonic Web Framework
@@ -66,7 +66,7 @@ from scratch.
 
 ## Planned Features
 
-Considering this project's codebase was worked on by just myself, some features had to be cut out in the
+Considering this project's codebase was a one man job, some features had to be cut out in the
 interests of polishing the product to achieve a MVP. Here were some of the features that were planned:
 
 - Images for events (using object storage from Google or AWS)
