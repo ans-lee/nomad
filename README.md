@@ -55,6 +55,7 @@ Here's a list of most of the technology used:
 
 - React with Typescript
 - Golang with Gin Gonic Web Framework
+- TailwindCSS
 - MongoDB
 - Google Maps API
 - Google Places API
