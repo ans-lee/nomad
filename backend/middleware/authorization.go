@@ -39,7 +39,8 @@ func CheckSessionToken(c *gin.Context) {
 
 	filter = bson.M{"token": token}
 	update := bson.M{
-		"$set": bson.M{"expiry": primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, 7).UTC())},
+		"$set": bson.M{"expiry": primitive.NewDateTimeFromTime(
+			time.Now().AddDate(0, 0, AuthConstants.SessionTokenExpiryDays).UTC())},
 	}
 
 	_, err = db.GetCollection(SessionModel.CollectionName).

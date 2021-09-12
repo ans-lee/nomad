@@ -60,12 +60,16 @@ Here's a list of most of the technology used:
 - Google Places API
 - Google Geocoding API
 
+The frontend was not bootstrapped with Create React App or any other toolchain. It is completely made
+from scratch.
+
 ## Planned Features
 
 Considering this project's codebase was worked on by just myself, some features had to be cut out in the
 interests of polishing the product to achieve a MVP. Here were some of the features that were planned:
 
-- Images for events
+- Images for events (using object storage from Google or AWS)
+- Mobile view
 - Group system, similar to Facebook events
 - End to end and unit testing
 - Using Google Maps to pick an event's location
@@ -79,72 +83,90 @@ Requirements:
 - Node 16.7.0
 - Yarn
 - MongoDB
+- A Google account with billing enabled
 
-**NOTE:** Make sure MongoDB is running on the machine. If you can access the MongoDB shell session using this command
-then MongoDB is running:
+### Setup
+
+1. Change into the `frontend` directory and run the below to install the frontend dependencies
+
+```
+yarn
+```
+
+2. Change into the `backend` directory and run the below to install the backend dependencies
+
+```
+go mod download
+```
+
+3. Make sure MongoDB is running on the machine if you are using it locally. If you can access
+the MongoDB shell session using this command then MongoDB is running:
 
 ```
 mongosh
 ```
 
-### In Development Mode
+4. On your Google Account, navigate to Google Cloud and enable Geocoding, Maps JavaScript and Places API
+and generate a API key which has access to the APIs mentioned.
 
-1. Change into the `frontend` directory and run the below to install the frontend dependencies
+**NOTE:** Places API and Geocoding API does not have a free tier so you need to activate billing if you
+aren't on a free trial to make it work.
+
+5. Create a `.env` file in the `frontend` directory with the following details and replace `your_api_key`
+and `your_mongodb_uri` with your Google API key and production API URL respectively
+(You can use localhost for `PROD_API_URL` if you don't want to use it on production mode)
 
 ```
-yarn
+GOOGLE_API_KEY=your_api_key
+DEV_API_URL=/api
+PROD_API_URL=your_ip_address_or_domain/api
 ```
 
-2. Change into the `backend` directory and run the below to install the backend dependencies
+6. Create a `.env` file in the `backend` directory with the following details and replace `your_api_key`
+and `your_mongodb_uri` with your Google API key and your MongoDB URI
+(If you're using MongoDB locally, you can use `mongodb://localhost:27017` which is the default
+URI. If it doesn't work, you may want to check whether the port number matches)
 
 ```
-go mod download
+DB_NAME=nomad
+DB_URI=your_mongodb_uri
+GMAP_API_KEY=your_api_key
 ```
 
-3. Run the frontend development server while in the `frontend` directory by running the below
+#### In Development Mode
+
+1. Run the frontend development server while in the `frontend` directory by running the below
 
 ```
 yarn dev
 ```
 
-4. Run the backend development server while in the `backend` directory by running the below
+2. Run the backend development server while in the `backend` directory by running the below
 
 ```
 bash run_server.sh
 ```
 
-5. Visit http://localhost:8080/ to view the website
+3. Visit http://localhost:8080/ to view the website
 
-### In Production Mode
+#### In Production Mode
 
-1. Change into the `frontend` directory and run the below to install the frontend dependencies
-
-```
-yarn
-```
-
-2. Change into the `backend` directory and run the below to install the backend dependencies
-
-```
-go mod download
-```
-
-3. Build the frontend by running the command below in the `frontend` directory
+1. Build the frontend by running the command below in the `frontend` directory
 
 ```
 yarn build
 ```
 
-4. Run the command below to start the frontend server in the `frontend` directory
+2. Run the command below to start the frontend server in the `frontend` directory
 
 ```
 node server.js
 ```
 
-5. Run the backend development server while in the `backend` directory by running the below
+3. Run the backend development server while in the `backend` directory by running the below
 
 ```
 bash run_server.sh production
 ```
 
-6. Check the IP/domain name of the system that is running the servers
+4. Check the IP/domain name of the system that is running the servers on a browser

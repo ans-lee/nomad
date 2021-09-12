@@ -95,9 +95,10 @@ func LogIn(c *gin.Context) {
 
 	token := utils.CreateSessionToken(AuthConstants.SessionTokenLength)
 	session := SessionModel.Session{
-		Token:  token,
-		Expiry: primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, 7).UTC()),
-		User:   user.ID,
+		Token: token,
+		Expiry: primitive.NewDateTimeFromTime(
+			time.Now().AddDate(0, 0, AuthConstants.SessionTokenExpiryDays).UTC()),
+		User: user.ID,
 	}
 
 	_, err = db.GetCollection(SessionModel.CollectionName).
@@ -126,6 +127,8 @@ func LogOut(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": ResponseConstants.InternalServerErrorMessage,
 		})
+
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

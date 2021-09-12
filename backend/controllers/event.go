@@ -301,6 +301,8 @@ func GetAllEvents(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": ResponseConstants.InternalServerErrorMessage,
 				})
+
+				return
 			}
 
 			if len(coords) > 0 {
@@ -381,6 +383,8 @@ func GetLocationSuggestions(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": ResponseConstants.InternalServerErrorMessage,
 		})
+
+		return
 	}
 
 	var result []string
