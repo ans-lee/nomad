@@ -172,3 +172,7 @@ bash run_server.sh production
 ```
 
 4. Check the IP/domain name of the system that is running the servers on a browser
+
+## Special Thanks
+
+- My anonymous teammate who helped me with some of the designs of the pages, the logo, fonts and colours.
